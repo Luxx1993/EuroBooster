@@ -123,7 +123,6 @@
     { code: 'IE', name: 'Irland', weight: 3 },
     { code: 'SK', name: 'Slowakei', weight: 2 },
     { code: 'HR', name: 'Kroatien', weight: 2 },
-    { code: 'BG', name: 'Bulgarien', weight: 2 },
     { code: 'SI', name: 'Slowenien', weight: 1.5 },
     { code: 'LT', name: 'Litauen', weight: 1.5 },
     { code: 'LV', name: 'Lettland', weight: 1.2 },

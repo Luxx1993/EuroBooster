@@ -32,8 +32,6 @@ Dieses Dokument beschreibt die **Euro-Münzen** der 25 Länder, die Euro-Münzen
 - **SM** - San Marino
 - **VA** - Vatikanstadt
 
-### Länder mit Euro als offizielle Währung (aber ohne eigene Münzprägung in der App)
-- **BG** - Bulgarien (plant Euro-Einführung)
 
 ## Münzwerte
 
