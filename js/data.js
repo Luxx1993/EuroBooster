@@ -123,7 +123,6 @@
     { code: 'IE', name: 'Irland', weight: 3 },
     { code: 'SK', name: 'Slowakei', weight: 2 },
     { code: 'HR', name: 'Kroatien', weight: 2 },
-    { code: 'BG', name: 'Bulgarien', weight: 2 },
     { code: 'SI', name: 'Slowenien', weight: 1.5 },
     { code: 'LT', name: 'Litauen', weight: 1.5 },
     { code: 'LV', name: 'Lettland', weight: 1.2 },
@@ -174,7 +173,11 @@
   // Kartenbilder im Hochformat, erzeugt mit scripts/build_card_images.py
   // aus den EZB-Gestaltungsvorschlägen in images/designs/.
   const CARD_IMAGES = 'images/cards';
-  const IMAGE_CREDIT = 'Bilder: © Europäische Zentralbank, Gestaltungsvorschläge für die künftigen Euro-Banknoten (2026). Verwendet im Rahmen redaktioneller Berichterstattung; Querformat-Entwürfe für die Karten um 90° gedreht.';
+  
+  // Münz-Kartenbilder im Hochformat, erzeugt mit scripts/build_coin_images.py
+  // aus den EZB-Münzbildern in images/coins/.
+  const COIN_CARD_IMAGES = 'images/coin_cards';
+  const IMAGE_CREDIT = 'Bilder: © Europäische Zentralbank, Gestaltungsvorschläge für die künftigen Euro-Banknoten (2026) und Euro-Münzen. Verwendet im Rahmen redaktioneller Berichterstattung; Querformat-Entwürfe für die Karten um 90° gedreht.';
 
   const STARTING_BALANCE = 500;
   const DAILY_DROP_RANGE = [1, 5]; // Cent
@@ -183,6 +186,6 @@
     DENOMS, DENOM_COLORS, MOTIFS, DESIGNS, DESIGN_WEIGHTS, PRINTERS,
     NOTE_BOOSTER, COIN_BOOSTER, COIN_COUNTRIES, HIT_COUNTRIES, COMMEMORATIVE_CHANCE,
     COMMEMORATIVE_YEARS, COIN_VALUES, EDITIONS, GOD_PACK_CHANCE, RARITY,
-    SPECIAL_SERIAL_CHANCE, STARTING_BALANCE, DAILY_DROP_RANGE, CARD_IMAGES, IMAGE_CREDIT,
+    SPECIAL_SERIAL_CHANCE, STARTING_BALANCE, DAILY_DROP_RANGE, CARD_IMAGES, COIN_CARD_IMAGES, IMAGE_CREDIT,
   };
 })(typeof window !== 'undefined' ? window : globalThis);
