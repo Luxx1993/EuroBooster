@@ -45,6 +45,12 @@ jobs:
           cp -r images/cards _site/images/
           # Münzen: nur die runden Relief-Vorlagen für den 3D-Renderer, nicht die Originale
           cp -r images/coin_web _site/images/
+          # Cache umgehen: CSS und JS bekommen die Commit-Version angehängt,
+          # damit Browser nach jedem Update die neuen Dateien laden
+          # (GitHub Pages erlaubt sonst 10 Minuten Zwischenspeichern).
+          v="${GITHUB_SHA::7}"
+          sed -i -E "s#(href|src)=\"(css/[^\"]+\.css|js/[^\"]+\.js)\"#\1=\"\2?v=${v}\"#g" _site/index.html
+          grep -c "?v=${v}" _site/index.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
