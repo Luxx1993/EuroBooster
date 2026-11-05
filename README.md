@@ -19,6 +19,8 @@ python3 -m http.server 8000
 # dann http://localhost:8000 öffnen
 ```
 
+**Online (GitHub Pages):** Nach jedem Merge auf `main` veröffentlicht der Workflow `.github/workflows/pages.yml` die App unter `https://luxx1993.github.io/EuroBooster/`. Einmalig nötig: in den Repo-Einstellungen unter *Settings → Pages → Build and deployment → Source* „GitHub Actions“ wählen. Bei Pull Requests laufen nur die Tests.
+
 Der Spielstand liegt im `localStorage` des Browsers und lässt sich im Profil (Tipp auf das Guthaben) zurücksetzen.
 
 ## Was drin ist

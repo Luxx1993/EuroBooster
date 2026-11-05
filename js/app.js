@@ -350,7 +350,7 @@
           <p class="muted" style="margin-top:8px">Der eigentliche Wert steckt in der Herkunft: Andorra, San Marino, Monaco und der Vatikan sind die Holo-Pulls.</p>
         </details>
       </article>
-      <div class="panel"><p><strong>„Zwei Prozent bleiben unser Ziel. Die restlichen 8,5 Prozent nennen wir Spielspaß.“</strong></p>
+      <div class="panel"><p><strong>„Zwei Prozent bleiben unser Ziel. Die restlichen 6,5 Prozent nennen wir Spielspaß.“</strong></p>
       <p class="muted" style="font-size:13px">Ausgabelimit heute: ${eur(S.spentToday.date === today() ? S.spentToday.amount : 0)} von ${eur(S.settings.limit)} · Nennwert der Inhalte wird deinem Guthaben gutgeschrieben, das Exemplar landet im Album.</p></div>`;
   }
 
