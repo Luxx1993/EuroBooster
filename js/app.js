@@ -248,8 +248,8 @@
       stack.innerHTML = notes.map((n) => noteHTML(n)).join('');
       $$('.note', stack).forEach((el, i) => {
         const off = notes.length - 1 - i;
-        el.style.fontSize = '13px';
-        el.style.transform = `translate(-50%, ${off * 34}px) scale(${1 - off * 0.04})`;
+        const k = i - (notes.length - 1) / 2;
+        el.style.transform = `translateX(calc(-50% + ${k * 44}px)) rotate(${k * 7}deg) translateY(${Math.abs(k) * 6}px)`;
         el.style.zIndex = 10 - off;
         el.style.cursor = 'pointer';
       });

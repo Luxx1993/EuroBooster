@@ -53,5 +53,6 @@ Der Test rechnet die Verteilung exakt aus und prüft die Zahlen aus dem Konzept:
 - **Siegerdesign:** Die EZB entscheidet voraussichtlich im Dezember 2026. Bis dahin ist Entwurf C als Platzhalter gesetzt (`WINNER_DESIGN` in `js/data.js`).
 - **Prototyp-Seltenheit:** Gleichverteilt, bis das Umfrageergebnis bekannt ist (`PROTOTYPE_WEIGHTS`).
 - **Farben der Stückelungen:** Farbcodes der heutigen Serie.
+- **Format:** Alle Scheine werden hochkant dargestellt, wie bei den Hochformat-Entwürfen D, G, I und J.
 - **Bilder:** Keine Reproduktionen der EZB-Entwürfe – Platzhalter mit Motivname und Stückelungsfarbe.
 - **Wirtschaft:** Der Nennwert der Inhalte wird dem Guthaben gutgeschrieben, das Exemplar landet im Album. So kostet ein Schein-Booster im Schnitt 4,25 €.
