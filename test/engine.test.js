@@ -50,13 +50,12 @@ test('Simulation stimmt mit exakter Rechnung überein', () => {
   near(sum / n, 45.75, 0.4, 'simulierter EV');
 });
 
-test('Pack-Aufbau: 5 Scheine + Prototyp, 10 Münzen', () => {
+test('Pack-Aufbau: 5 Scheine, 10 Münzen', () => {
   const rng = EB.seeded(7);
   const p = EB.openNotePack(rng);
   assert.equal(p.items.length, 5);
   assert.ok(p.items[4].hit);
-  assert.equal(p.bonus.kind, 'proto');
-  assert.notEqual(p.bonus.design, D.WINNER_DESIGN);
+  assert.ok(p.items.every((n) => n.kind === 'note'));
   const c = EB.openCoinPack(rng);
   assert.equal(c.items.length, 10);
   assert.ok([100, 200].includes(c.items[9].cents));
@@ -84,12 +83,12 @@ test('Tausch: immer 1:1 zum gleichen Nennwert', () => {
   for (let i = 0; i < 300; i++) {
     const p = EB.openNotePack(rng);
     const c = EB.openCoinPack(rng);
-    for (const it of [...p.items, p.bonus, ...c.items]) {
+    for (const it of [...p.items, ...c.items]) {
       const o = EB.makeTradeOffer(rng, it, new Set());
       assert.equal(o.kind, it.kind);
       if (it.kind === 'note') assert.equal(o.denom, it.denom);
       if (it.kind === 'coin') assert.equal(o.cents, it.cents);
-      if (it.kind !== 'note') assert.notEqual(o.id, it.id, 'Prototypen und Münzen: anderes Stück');
+      assert.notEqual(o.id, it.id, 'anderer Entwurf bzw. anderes Land');
     }
   }
 });
@@ -99,4 +98,19 @@ test('Tausch: bevorzugt fehlende Stücke', () => {
   const coin = { kind: 'coin', id: EB.coinId('DE', 100), cents: 100, country: 'DE' };
   const owned = new Set(D.COIN_COUNTRIES.filter((c) => c.code !== 'VA').map((c) => EB.coinId(c.code, 100)));
   for (let i = 0; i < 20; i++) assert.equal(EB.makeTradeOffer(rng, coin, owned).country, 'VA');
+});
+
+test('Alle zehn Entwürfe kommen in Packs vor, etwa gleich oft', () => {
+  const rng = EB.seeded(11);
+  const n = {};
+  for (let i = 0; i < 4000; i++) for (const it of EB.openNotePack(rng).items) n[it.design] = (n[it.design] || 0) + 1;
+  assert.deepEqual(Object.keys(n).sort(), D.DESIGNS.map((d) => d.id));
+  for (const d of D.DESIGNS) near(n[d.id] / 20000, 0.1, 0.01, 'Anteil ' + d.id);
+});
+
+test('Tausch eines Scheins: bevorzugt fehlender Entwurf', () => {
+  const rng = EB.seeded(5);
+  const note = { kind: 'note', id: EB.noteId('A', 20), denom: 20, design: 'A' };
+  const owned = new Set(D.DESIGNS.filter((d) => d.id !== 'G').map((d) => EB.noteId(d.id, 20)));
+  for (let i = 0; i < 20; i++) assert.equal(EB.makeTradeOffer(rng, note, owned).design, 'G');
 });

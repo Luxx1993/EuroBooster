@@ -2,7 +2,7 @@
 
 **Kauf Geld, mit Geld.**
 
-Ein Sammelspiel mit den neuen Euro-Banknoten: Ein Booster kostet 50 € und enthält fünf zufällige Scheine, mal 30 €, mal 250 € wert, im Schnitt 45,75 €. Statt Monstern sammelt man Beethoven, Marie Curie und Eisvögel. Dazu kommen die nie gedruckten Entwürfe der EZB als Prototyp-Karten und Münzen aus 25 Ländern. Seltene Seriennummern und Special Editions wie Holo oder Gold machen auch einen 5er zum Highlight. Doppelte tauscht man 1:1, weil es ja Geld ist.
+Ein Sammelspiel mit den neuen Euro-Banknoten: Ein Booster kostet 50 € und enthält fünf zufällige Scheine, mal 30 €, mal 250 € wert, im Schnitt 45,75 €. Statt Monstern sammelt man Beethoven, Marie Curie und Eisvögel. Digital gibt es keine Druckkosten, also sind alle zehn Entwürfe der EZB gültiges Geld – 60 verschiedene Scheine, dazu Münzen aus 25 Ländern. Seltene Seriennummern und Special Editions wie Holo oder Gold machen auch einen 5er zum Highlight. Doppelte tauscht man 1:1, weil es ja Geld ist.
 
 Die Pointe: Ausgerechnet die Zentralbank, die für Preisstabilität sorgt, betreibt die erfolgreichste Lootbox Europas, und die Bank gewinnt immer.
 
@@ -27,10 +27,10 @@ Der Spielstand liegt im `localStorage` des Browsers und lässt sich im Profil (T
 
 | Bereich | Umsetzung |
 | --- | --- |
-| Shop | Schein-Booster (50 €, 5 Scheine + Prototyp-Karte) und Münz-Booster (3 €, 10 Münzen), offene Quoten pro Slot und Verteilung des Packwerts |
-| Pack-Opening | Aufreißen per Wischen über die Oberkante (Doppeltipp oder Enter als Alternative), Vorahnungs-Licht in der Farbe des besten Scheins, gewöhnliche Slots einzeln, Trennkarte, Stufen-Reveal (Druckland → Druckerei → Stückelung), Hit-Effekte, Seriennummer tippt sich ein, Prototyp-Bonus |
+| Shop | Schein-Booster (50 €, 5 Scheine) und Münz-Booster (3 €, 10 Münzen), offene Quoten pro Slot und Verteilung des Packwerts |
+| Pack-Opening | Aufreißen per Wischen über die Oberkante (Doppeltipp oder Enter als Alternative), Vorahnungs-Licht in der Farbe des besten Scheins, gewöhnliche Slots einzeln, Trennkarte, Stufen-Reveal (Druckland → Druckerei → Entwurf → Stückelung), Hit-Effekte, Seriennummer tippt sich ein |
 | Übersicht | Aufgefächerte Scheine mit Hit in der Mitte, hochlaufender Packwert, „Bank gewinnt“ oder „Du schlägst die EZB“, Ins Album / Noch ein Pack / Teilen |
-| Album | Echte Serie, Prototypen (9 Entwürfe × 6), Münzen (25 Länder × 8), Gedenkmünzen als Zeitleiste, Tresor für Special Editions; Set-Bonus bei voller Seite |
+| Album | Scheine (10 Entwürfe × 6 Stückelungen = 60), Münzen (25 Länder × 8), Gedenkmünzen als Zeitleiste, Tresor für Special Editions; Set-Bonus bei voller Seite |
 | Einzelansicht | Holo-Neigung per Maus oder Gerätesensor, Wenden per Wischen, Steckbrief mit Seriennummer, Druckerei, Edition, Exemplaren |
 | Special Editions | Holo, Glitzer, Tinte, Gold, Alternativmotiv, Fehldruck, Zentralbank-Pack (God Pack) |
 | Tausch | Doppelte 1:1 zum gleichen Nennwert mit simulierten Sammlern tauschen; bevorzugt kommt, was dir fehlt. Der eigene Schein fliegt über die obere Bildschirmkante hinaus, der neue kommt von oben herein |
@@ -63,8 +63,8 @@ Der Test rechnet die Verteilung exakt aus und prüft die Zahlen aus dem Konzept:
 
 ## Annahmen
 
-- **Siegerdesign:** Die EZB entscheidet voraussichtlich im Dezember 2026. Bis dahin ist Entwurf C als Platzhalter gesetzt (`WINNER_DESIGN` in `js/data.js`).
-- **Prototyp-Seltenheit:** Gleichverteilt, bis das Umfrageergebnis bekannt ist (`PROTOTYPE_WEIGHTS`).
+- **Alle Entwürfe gültig:** Digital gibt es keine Druckkosten, deshalb sind alle zehn EZB-Entwürfe gültiges Geld – egal, welchen der EZB-Rat für die gedruckte Serie wählt. Jeder Schein im Pack bekommt einen zufälligen Entwurf.
+- **Häufigkeit der Entwürfe:** Gleichverteilt (`DESIGN_WEIGHTS` in `js/data.js`); später z. B. nach dem Ergebnis der EZB-Umfrage gewichtbar.
 - **Farben der Stückelungen:** Farbcodes der heutigen Serie.
 - **Format:** Alle Scheine werden hochkant dargestellt, wie bei den Hochformat-Entwürfen D, G, I und J.
 - **Bilder:** Die Karten zeigen die echten Gestaltungsvorschläge der EZB, verwendet im Rahmen redaktioneller Berichterstattung. `scripts/build_card_images.py` erzeugt aus den Originalen in `images/designs/` die Kartenbilder in `images/cards/`: Querformat-Entwürfe werden um 90° gedreht, alle auf 1:1,9 zugeschnitten. Online veröffentlicht werden nur die Kartenbilder. Fehlt ein Bild, zeigt die Karte den gezeichneten Platzhalter.

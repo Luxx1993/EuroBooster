@@ -53,13 +53,10 @@
     { id: 'J', designer: 'Ville Tietäväinen', theme: 'natur', style: 'Bildgeschichte von der Quelle zum Meer' },
   ];
 
-  // Die EZB entscheidet voraussichtlich im Dezember 2026. Bis dahin ist das
-  // Siegerdesign eine Annahme und hier umstellbar.
-  const WINNER_DESIGN = 'C';
-
-  // Gewicht der Prototyp-Entwürfe für den 6. Slot. Später nach dem Ergebnis
-  // der EZB-Umfrage setzen: weniger Stimmen = seltener. Vorerst gleichverteilt.
-  const PROTOTYPE_WEIGHTS = { A: 1, B: 1, C: 1, D: 1, E: 1, F: 1, G: 1, H: 1, I: 1, J: 1 };
+  // Digital gibt es keine Druckkosten: Alle zehn Entwürfe sind gültiges Geld.
+  // Gewicht = wie oft ein Entwurf im Pack auftaucht. Später z. B. nach dem
+  // Ergebnis der EZB-Umfrage setzen (weniger Stimmen = seltener).
+  const DESIGN_WEIGHTS = { A: 1, B: 1, C: 1, D: 1, E: 1, F: 1, G: 1, H: 1, I: 1, J: 1 };
 
   // Druckereien: Code -> Ort und Land (Flagge im Stufen-Reveal), Gewicht = Häufigkeit
   const PRINTERS = [
@@ -91,7 +88,6 @@
       { label: 'Ungewöhnlich', odds: [[5, 0.4], [10, 0.45], [20, 0.15]] },
       { label: 'Selten (Hit-Slot)', odds: [[10, 0.6], [20, 0.3], [50, 0.07], [100, 0.025], [200, 0.005]] },
     ],
-    prototypeBonus: true,
   };
 
   // Werte in Cent
@@ -184,7 +180,7 @@
   const DAILY_DROP_RANGE = [1, 5]; // Cent
 
   root.EB_DATA = {
-    DENOMS, DENOM_COLORS, MOTIFS, DESIGNS, WINNER_DESIGN, PROTOTYPE_WEIGHTS, PRINTERS,
+    DENOMS, DENOM_COLORS, MOTIFS, DESIGNS, DESIGN_WEIGHTS, PRINTERS,
     NOTE_BOOSTER, COIN_BOOSTER, COIN_COUNTRIES, HIT_COUNTRIES, COMMEMORATIVE_CHANCE,
     COMMEMORATIVE_YEARS, COIN_VALUES, EDITIONS, GOD_PACK_CHANCE, RARITY,
     SPECIAL_SERIAL_CHANCE, STARTING_BALANCE, DAILY_DROP_RANGE, CARD_IMAGES, IMAGE_CREDIT,
