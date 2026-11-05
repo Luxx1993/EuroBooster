@@ -15,6 +15,7 @@ Die neue Serie ist dafür ideal, weil sie erstmals echte Motive zeigt – Persö
 - **Hochformat:** Alle Scheine werden hochkant dargestellt, wie die Hochformat-Entwürfe D, G, I und J. Querformat-Entwürfe werden um 90° gedreht.
 - **Echte Bilder:** Die Karten zeigen die Gestaltungsvorschläge der EZB, im Rahmen redaktioneller Berichterstattung und mit Bildnachweis.
 - **Tausch:** 1:1 zum gleichen Nennwert, bevorzugt gegen einen fehlenden Entwurf. Der eigene Schein fliegt über die obere Bildschirmkante hinaus, der neue kommt von oben herein.
+- **Münzen in 3D:** Die Münzen werden im Code gerendert – Metall, Dicke, Rand und Rückseite aus dem Code, das Relief aus Fotos der Nationalseiten. Im Hit-Slot kommen echte 2-€-Gedenkmünzen. Bulgarien ist seit 1. Januar 2026 im Euroraum und dabei.
 
 ## Satire-Edition: Das offizielle EZB-Produkt
 

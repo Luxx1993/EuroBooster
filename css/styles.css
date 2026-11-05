@@ -512,3 +512,14 @@ button { font: inherit; color: inherit; cursor: pointer; }
   filter: drop-shadow(-4px 2px 0 rgba(233, 92, 192, .55)) drop-shadow(3px -1px 0 rgba(111, 227, 195, .6));
 }
 .image-credit { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+/* ---------- Münzen in 3D (js/coin3d.js) ---------- */
+.coin canvas.coin3d {
+  position: absolute; inset: -6%; width: 112%; height: 112%;
+  z-index: 1; pointer-events: none;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .45));
+}
+/* Sobald die 3D-Münze steht, verschwindet der gezeichnete Platzhalter */
+.coin.coin3d-on { background: none; box-shadow: none; }
+.coin.coin3d-on > div, .coin.coin3d-on.gedenk::after { visibility: hidden; }
+.coin.coin3d-on.rare-country { box-shadow: 0 0 22px 2px rgba(255, 197, 61, .55); }

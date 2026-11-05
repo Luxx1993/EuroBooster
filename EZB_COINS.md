@@ -1,159 +1,50 @@
-# EZB Euro-Münzen
+# Euro-Münzen in EUROPACK
 
-Dieses Dokument beschreibt die **Euro-Münzen** der 25 Länder, die Euro-Münzen prägen.
+Die Münzen im Münz-Booster stammen aus 25 Prägeländern: den 21 Ländern des Euroraums und den vier Kleinstaaten mit eigenem Prägerecht. Bulgarien gehört seit dem 1. Januar 2026 zum Euroraum; der Lew war nur bis Ende Januar 2026 parallel gültig.
 
-## Euro-Länder
+## Länder
 
-### Eurozone (20 Länder)
-- **DE** - Deutschland
-- **AT** - Österreich
-- **BE** - Belgien
-- **CY** - Zypern
-- **EE** - Estland
-- **FI** - Finnland
-- **FR** - Frankreich
-- **GR** - Griechenland
-- **IE** - Irland
-- **IT** - Italien
-- **HR** - Kroatien
-- **LV** - Lettland
-- **LT** - Litauen
-- **LU** - Luxemburg
-- **MT** - Malta
-- **NL** - Niederlande
-- **PT** - Portugal
-- **SK** - Slowakei
-- **SI** - Slowenien
-- **ES** - Spanien
+**Euroraum (21):** Belgien (BE), Bulgarien (BG), Deutschland (DE), Estland (EE), Finnland (FI), Frankreich (FR), Griechenland (GR), Irland (IE), Italien (IT), Kroatien (HR), Lettland (LV), Litauen (LT), Luxemburg (LU), Malta (MT), Niederlande (NL), Österreich (AT), Portugal (PT), Slowakei (SK), Slowenien (SI), Spanien (ES), Zypern (CY)
 
-### Kleinstaaten mit Euro-Prägerecht (4 Länder)
-- **AD** - Andorra
-- **MC** - Monaco
-- **SM** - San Marino
-- **VA** - Vatikanstadt
+**Kleinstaaten mit Prägerecht (4):** Andorra (AD), Monaco (MC), San Marino (SM), Vatikanstadt (VA)
 
+Jedes Land prägt acht Werte: 1, 2, 5, 10, 20 und 50 Cent, 1 € und 2 €. Dazu kommen 2-€-Gedenkmünzen.
 
-## Münzwerte
+## Darstellung in der App
 
-Alle Länder prägen Münzen in diesen 8 Werten:
-- 1 Cent
-- 2 Cent
-- 5 Cent
-- 10 Cent
-- 20 Cent
-- 50 Cent
-- 1 € (100 Cent)
-- 2 € (200 Cent)
+Die Fotos werden nicht direkt gezeigt. `js/coin3d.js` rendert jede Münze im Code als 3D-Scheibe (WebGL-Raytracing):
 
-## Bildstruktur
+- **Metall** nach Wert: Kupfer (1–5 Cent), Nordisches Gold (10–50 Cent), Bimetall bei 1 € (Kern silbern, Ring golden) und 2 € (Kern golden, Ring silbern)
+- **Dicke und Rand**, geriffelt bei 10 Cent, 50 Cent und 2 €
+- **Relief** aus dem Foto der Nationalseite: Helligkeitsunterschiede werden zu Erhebungen, Licht und Spiegelungen wandern darüber
+- **Gemeinschaftsseite** im Code gezeichnet (Wert, „EURO“/„EURO CENT“, zwölf Sterne, Linien)
+- **Animation:** Einwurf mit Drehung im Pack, leichtes Wiegen, Neigung nach Finger oder Gerätesensor in der Einzelansicht, „Wenden“
 
-Die Münzbilder sind in folgender Struktur organisiert:
+Ohne WebGL erscheint eine gezeichnete Münze mit Flagge und Wert.
+
+## Dateien
 
 ```
-images/coins/
-├── DE/
-│   ├── 1cent_national.jpg
-│   ├── 2cent_national.jpg
-│   ├── 5cent_national.jpg
-│   ├── 10cent_national.jpg
-│   ├── 20cent_national.jpg
-│   ├── 50cent_national.jpg
-│   ├── 100cent_national.jpg
-│   └── 200cent_national.jpg
-├── FR/
-│   ├── 1cent_national.jpg
-│   └── ...
-├── ...
-├── VA/
-│   └── ...
-└── common/
-    ├── 1cent_common.jpg
-    ├── 2cent_common.jpg
-    ├── 5cent_common.jpg
-    ├── 10cent_common.jpg
-    ├── 20cent_common.jpg
-    ├── 50cent_common.jpg
-    ├── 100cent_common.jpg
-    └── 200cent_common.jpg
-```
-
-Die **Nationalseiten** zeigen landesspezifische Motive, während die **Gemeinschaftsseiten** für alle Länder gleich sind und europäische Motive zeigen.
-
-## Kartenbilder
-
-Für die App werden die Münzbilder in Hochformat (400 × 760 px) konvertiert und in `images/coin_cards/` gespeichert:
-
-```
-images/coin_cards/
-├── DE/
-│   ├── 1cent_national.jpg
-│   ├── 2cent_national.jpg
-│   └── ...
-├── FR/
-│   └── ...
-└── ...
+images/coins/<Land>/<Cent>cent_national.jpg     Originale der Nationalseiten (nur im Repo)
+images/coins/commemoratives/<Jahr>_<land>-<Nr>.jpg  Originale der Gedenkmünzen (nur im Repo)
+images/coin_web/<Land>/<Cent>.webp               runde Relief-Vorlagen, 256 px (online)
+images/coin_web/commemoratives/<…>.webp           dito für Gedenkmünzen
+js/coins.js                                      Verzeichnis der Gedenkmünzen (erzeugt)
 ```
 
 ## Skripte
 
-### `scripts/download_ezb_coins.py`
-Python-Skript zum Herunterladen aller EZB-Münz-Bilder.
+1. `python3 scripts/download_ezb_coins.py` – lädt die Originale aus der Sammlung [lucephile/euro-coin-images](https://github.com/lucephile/euro-coin-images) und wandelt sie in JPEG um.
+2. `python3 scripts/build_coin_web.py` – sucht in jedem Foto den Umriss der Münze (Hintergrund von den Ecken aus füllen, sonst Kreissuche), schneidet sie rund aus und speichert sie als WebP mit transparentem Hintergrund. Die Originale haben gemischte Hintergründe (weiß, schwarz, kariert) und sitzen teils nicht mittig.
+3. `python3 scripts/build_coin_index.py` – schreibt `js/coins.js` mit allen Gedenkmünzen bis zum laufenden Jahr.
 
-**Verwendung:**
-```bash
-python3 scripts/download_ezb_coins.py
-```
+## Bekannte Lücken
 
-Das Skript lädt alle Nationalseiten und Gemeinschaftsseiten von der EZB-Website herunter.
+- Gedenkmünzen der Niederlande, San Marinos und Bulgariens fehlen: Das Download-Skript schnitt Ländernamen mit Bindestrich ab („pays-bas“, „saint-marin“), und Bulgarien war nicht zugeordnet. Beides ist im Skript behoben; die Bilder kommen beim nächsten Download dazu.
+- Echte Fotos der Gemeinschaftsseiten gibt es nicht; die Rückseite wird im Code gezeichnet.
 
-### `scripts/build_coin_images.py`
-Python-Skript zum Erzeugen der Kartenbilder im Hochformat.
+## Bildnachweis
 
-**Verwendung:**
-```bash
-python3 scripts/build_coin_images.py
-```
-
-Das Skript konvertiert die Originalbilder in das Format 400 × 760 px für die App.
-
-## Bildquellen
-
-Die Bilder der Euro-Münzen stammen von der offiziellen EZB-Website:
-- [EZB - Euro-Münzen](https://www.ecb.europa.eu/euro/coins/html/index.de.html)
-- [EZB - Münzbilder](https://www.ecb.europa.eu/euro/coins/shared/img/coins/)
-
-## Nutzungsbedingungen
-
-Die Bilder der Euro-Münzen unterliegen den Nutzungsbedingungen der EZB:
-
-✅ **Erlaubt:**
-- Verwendung zu Informations-, redaktionellen und Berichterstattungszwecken
-- Verwendung in nicht-kommerziellen Projekten
-
-❌ **Nicht erlaubt:**
-- Kommerzielle Nutzung
-- Verwendung zu Werbe- oder Merchandisingzwecken
-- Jegliche Veränderung der Bilder
-- Irreführende Darstellung
-- Verwendung, die eine Billigung durch die EZB oder das Eurosystem nahelegt
-
-📝 **Pflicht:**
-- Kennzeichnung als "Euro-Münze"
-- Angabe der EZB als Quelle
-
-## Integration in die App
-
-In `js/data.js` sind die Münzbilder über `COIN_CARD_IMAGES` referenziert:
-
-```javascript
-const COIN_CARD_IMAGES = 'images/coin_cards';
-```
-
-Die App kann die Bilder wie folgt verwenden:
-```javascript
-const imgPath = `${D.COIN_CARD_IMAGES}/${countryCode}/${value}cent_national.jpg`;
-```
-
----
+Motive der Nationalseiten und Gedenkmünzen: die jeweiligen Ausgabeländer. Bildquelle: Sammlung [lucephile/euro-coin-images](https://github.com/lucephile/euro-coin-images). Verwendet im Rahmen redaktioneller Berichterstattung, als Relief-Vorlage für im Code gerenderte Münzen.
 
 *Stand: November 2026*
