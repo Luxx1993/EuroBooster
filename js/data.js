@@ -123,6 +123,7 @@
     { code: 'IE', name: 'Irland', weight: 3 },
     { code: 'SK', name: 'Slowakei', weight: 2 },
     { code: 'HR', name: 'Kroatien', weight: 2 },
+    { code: 'BG', name: 'Bulgarien', weight: 2 }, // seit 1. Januar 2026 im Euroraum
     { code: 'SI', name: 'Slowenien', weight: 1.5 },
     { code: 'LT', name: 'Litauen', weight: 1.5 },
     { code: 'LV', name: 'Lettland', weight: 1.2 },
@@ -139,7 +140,10 @@
   // Länder, die im Hit-Slot als "selten" gelten (kleine Auflagen)
   const HIT_COUNTRIES = ['AD', 'SM', 'MC', 'VA', 'MT', 'CY', 'LU', 'EE'];
   const COMMEMORATIVE_CHANCE = 0.5; // Anteil Gedenkmünzen unter den 2-€-Hits
-  const COMMEMORATIVE_YEARS = [2004, 2026]; // von–bis
+  const COMMEMORATIVE_YEARS = [2004, 2026]; // von–bis, nur falls js/coins.js fehlt
+  // Echte Gedenkmünzen [Land, Jahr, Nummer, Datei], erzeugt mit
+  // scripts/build_coin_index.py aus images/coins/commemoratives/.
+  const COMMEMORATIVES = (root.EB_COINS && root.EB_COINS.commemoratives) || [];
 
   const COIN_VALUES = [1, 2, 5, 10, 20, 50, 100, 200];
 
@@ -173,11 +177,14 @@
   // Kartenbilder im Hochformat, erzeugt mit scripts/build_card_images.py
   // aus den EZB-Gestaltungsvorschlägen in images/designs/.
   const CARD_IMAGES = 'images/cards';
-  
-  // Münz-Kartenbilder im Hochformat, erzeugt mit scripts/build_coin_images.py
-  // aus den EZB-Münzbildern in images/coins/.
-  const COIN_CARD_IMAGES = 'images/coin_cards';
-  const IMAGE_CREDIT = 'Bilder: © Europäische Zentralbank, Gestaltungsvorschläge für die künftigen Euro-Banknoten (2026) und Euro-Münzen. Verwendet im Rahmen redaktioneller Berichterstattung; Querformat-Entwürfe für die Karten um 90° gedreht.';
+
+  // Relief-Vorlagen der Münzen für den 3D-Renderer (js/coin3d.js): rund
+  // freigestellt mit scripts/build_coin_web.py aus den Originalen in images/coins/
+  // (geladen mit scripts/download_ezb_coins.py).
+  //   images/coin_web/<Land>/<Cent>.webp, images/coin_web/commemoratives/<Datei>.webp
+  const COIN_IMAGES = 'images/coin_web';
+  const COIN_IMAGE_SOURCE = 'github.com/lucephile/euro-coin-images';
+  const IMAGE_CREDIT = 'Banknoten: © Europäische Zentralbank, Gestaltungsvorschläge für die künftigen Euro-Banknoten (2026); Querformat-Entwürfe für die Karten um 90° gedreht. Münzen: Nationalseiten und Gedenkmünzen der Euro-Länder, Motive der jeweiligen Ausgabeländer; Bilder aus der Sammlung ' + COIN_IMAGE_SOURCE + '. Verwendet im Rahmen redaktioneller Berichterstattung.';
 
   const STARTING_BALANCE = 500;
   const DAILY_DROP_RANGE = [1, 5]; // Cent
@@ -185,7 +192,7 @@
   root.EB_DATA = {
     DENOMS, DENOM_COLORS, MOTIFS, DESIGNS, DESIGN_WEIGHTS, PRINTERS,
     NOTE_BOOSTER, COIN_BOOSTER, COIN_COUNTRIES, HIT_COUNTRIES, COMMEMORATIVE_CHANCE,
-    COMMEMORATIVE_YEARS, COIN_VALUES, EDITIONS, GOD_PACK_CHANCE, RARITY,
-    SPECIAL_SERIAL_CHANCE, STARTING_BALANCE, DAILY_DROP_RANGE, CARD_IMAGES, COIN_CARD_IMAGES, IMAGE_CREDIT,
+    COMMEMORATIVE_YEARS, COMMEMORATIVES, COIN_VALUES, EDITIONS, GOD_PACK_CHANCE, RARITY,
+    SPECIAL_SERIAL_CHANCE, STARTING_BALANCE, DAILY_DROP_RANGE, CARD_IMAGES, COIN_IMAGES, COIN_IMAGE_SOURCE, IMAGE_CREDIT,
   };
 })(typeof window !== 'undefined' ? window : globalThis);

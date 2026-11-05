@@ -30,6 +30,7 @@ Der Spielstand liegt im `localStorage` des Browsers und lässt sich im Profil (T
 | Shop | Schein-Booster (50 €, 5 Scheine) und Münz-Booster (3 €, 10 Münzen), offene Quoten pro Slot und Verteilung des Packwerts |
 | Pack-Opening | Aufreißen per Wischen über die Oberkante (Doppeltipp oder Enter als Alternative), Vorahnungs-Licht in der Farbe des besten Scheins, gewöhnliche Slots einzeln, Trennkarte, Stufen-Reveal (Druckland → Druckerei → Entwurf), Hit-Effekte, Seriennummer tippt sich ein |
 | Übersicht | Aufgefächerte Scheine mit Hit in der Mitte, hochlaufender Packwert, „Bank gewinnt“ oder „Du schlägst die EZB“, Ins Album / Noch ein Pack / Teilen |
+| Münzen | Im Code gerenderte 3D-Münzen (WebGL): Metall je Wert (Kupfer, Nordisches Gold, Bimetall bei 1 € und 2 €), Dicke und geriffelter Rand, Relief aus dem Foto der Nationalseite, erzeugte Gemeinschaftsseite. Im Pack ein Münzwurf: von unten hereingeworfen, Landung auf der Zahl (für alle Länder gleich), dann Umdrehen auf die Bildseite – erst dann steht das Land fest. Im Album liegen sie gerade und unbewegt mit der Bildseite nach oben; in der Einzelansicht lassen sie sich per Ziehen 360° drehen, folgen Finger oder Neigung, „Wenden“ zeigt die Rückseite. Im Hit-Slot echte 2-€-Gedenkmünzen (568 aus 22 Ländern, 2004–2026). Ohne WebGL erscheint eine gezeichnete Münze |
 | Album | Scheine (10 Entwürfe × 6 Stückelungen = 60), Münzen (25 Länder × 8), Gedenkmünzen als Zeitleiste, Tresor für Special Editions; Set-Bonus bei voller Seite |
 | Einzelansicht | Holo-Neigung per Maus oder Gerätesensor, Wenden per Wischen, Steckbrief mit Seriennummer, Druckerei, Edition, Exemplaren |
 | Special Editions | Holo, Glitzer, Tinte, Gold, Alternativmotiv, Fehldruck, Zentralbank-Pack (God Pack) |
@@ -49,8 +50,10 @@ test/engine.test.js Prüft die Zahlen aus dem Konzept
 test/images.test.js Prüft, dass jede Karte ein Bild hat
 images/designs/     EZB-Originale Banknoten (120 Bilder, nur im Repo, nicht online)
 images/cards/       Banknoten-Kartenbilder im Hochformat, 400 × 760 px
-images/coins/       EZB-Münz-Originale (200+ Bilder, nur im Repo, nicht online)
-images/coin_cards/  Münz-Kartenbilder im Hochformat, 400 × 760 px
+images/coins/       Münz-Originale: Nationalseiten (25 Länder × 8 Werte) und 569 Gedenkmünzen, nur im Repo
+images/coin_web/    Runde Relief-Vorlagen (256 px, WebP) für die 3D-Münzen, online
+js/coin3d.js        Münzen in 3D: WebGL-Raytracing mit Metall, Rand, Relief und erzeugter Rückseite
+js/coins.js         Verzeichnis der Gedenkmünzen (erzeugt)
 scripts/            Download der Originale, Erzeugen der Kartenbilder
 docs/konzept.md     Konzept und App-Spezifikation
 ```
@@ -76,4 +79,4 @@ Der Test rechnet die Verteilung exakt aus und prüft die Zahlen aus dem Konzept:
 
 Banknotenmotive: © Europäische Zentralbank, [Gestaltungsvorschläge für die künftigen Euro-Banknoten](https://www.ecb.europa.eu/euro/banknotes/future_banknotes/html/design-proposals.de.html) (2026), Entwürfe A–J der jeweils genannten Gestalterinnen und Gestalter. Verwendet im Rahmen redaktioneller Berichterstattung; für die Karten auf Hochformat zugeschnitten und Querformat-Entwürfe gedreht. Die Entwürfe sind kein gesetzliches Zahlungsmittel.
 
-Münzmotive: © Europäische Zentralbank, [Euro-Münzen](https://www.ecb.europa.eu/euro/coins/html/index.de.html). Verwendet im Rahmen redaktioneller Berichterstattung; für die Karten auf Hochformat zugeschnitten. Die Münzbilder zeigen die Nationalseiten der 25 Euro-Prägeländer.
+Münzmotive: Nationalseiten und 2-€-Gedenkmünzen der 25 Euro-Prägeländer (21 Euro-Länder einschließlich Bulgarien seit 1. Januar 2026, dazu Andorra, Monaco, San Marino, Vatikanstadt); die Rechte an den Motiven liegen bei den Ausgabeländern. Bildquelle: Sammlung [lucephile/euro-coin-images](https://github.com/lucephile/euro-coin-images). Die App zeigt die Fotos nicht direkt: Sie dienen als Relief-Vorlage für im Code gerenderte 3D-Münzen. Verwendet im Rahmen redaktioneller Berichterstattung.

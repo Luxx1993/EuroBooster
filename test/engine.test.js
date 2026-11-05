@@ -4,6 +4,7 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
 
+require('../js/coins.js');
 require('../js/data.js');
 require('../js/engine.js');
 const D = globalThis.EB_DATA;
@@ -113,4 +114,38 @@ test('Tausch eines Scheins: bevorzugt fehlender Entwurf', () => {
   const note = { kind: 'note', id: EB.noteId('A', 20), denom: 20, design: 'A' };
   const owned = new Set(D.DESIGNS.filter((d) => d.id !== 'G').map((d) => EB.noteId(d.id, 20)));
   for (let i = 0; i < 20; i++) assert.equal(EB.makeTradeOffer(rng, note, owned).design, 'G');
+});
+
+test('Münzen: 21 Euro-Länder plus 4 Kleinstaaten, Bulgarien dabei', () => {
+  assert.equal(D.COIN_COUNTRIES.length, 25);
+  assert.ok(D.COIN_COUNTRIES.some((c) => c.code === 'BG'));
+});
+
+test('Gedenkmünzen im Hit-Slot sind echte Münzen aus dem Verzeichnis', () => {
+  const rng = EB.seeded(21);
+  const files = new Set(D.COMMEMORATIVES.map((e) => 'commemoratives/' + e[3]));
+  let n = 0;
+  for (let i = 0; i < 3000; i++) {
+    const hit = EB.openCoinPack(rng).items[9];
+    if (!hit.commemorative) continue;
+    n++;
+    assert.equal(hit.cents, 200);
+    assert.ok(files.has(hit.img), hit.img);
+    assert.match(hit.id, /^G-[A-Z]{2}-\d{4}-\d+$/);
+  }
+  // 30 % der Hits sind 2 €, davon die Hälfte Gedenkmünzen
+  near(n / 3000, 0.15, 0.02, 'Anteil Gedenkmünzen');
+});
+
+test('Tausch einer Gedenkmünze: anderes Land, bevorzugt fehlende', () => {
+  const rng = EB.seeded(8);
+  const g = EB.openCoinPack(rng).items.find(() => true);
+  const item = { kind: 'coin', cents: 200, country: 'DE', commemorative: 2015, id: 'G-DE-2015-1' };
+  const owned = new Set(D.COMMEMORATIVES.filter((e) => e[0] !== 'VA').map((e) => EB.gedenkId(e[0], e[1], e[2])));
+  for (let i = 0; i < 10; i++) {
+    const o = EB.makeTradeOffer(rng, item, owned);
+    assert.equal(o.country, 'VA');
+    assert.ok(o.commemorative);
+  }
+  assert.ok(g);
 });

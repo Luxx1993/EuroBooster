@@ -512,3 +512,20 @@ button { font: inherit; color: inherit; cursor: pointer; }
   filter: drop-shadow(-4px 2px 0 rgba(233, 92, 192, .55)) drop-shadow(3px -1px 0 rgba(111, 227, 195, .6));
 }
 .image-credit { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+/* ---------- Münzen in 3D (js/coin3d.js) ---------- */
+.coin canvas.coin3d {
+  position: absolute; inset: -6%; width: 112%; height: 112%;
+  z-index: 1; pointer-events: none;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .45));
+}
+/* Sobald die 3D-Münze steht, verschwindet der gezeichnete Platzhalter */
+.coin.coin3d-on { background: none; box-shadow: none; }
+.coin.coin3d-on > div, .coin.coin3d-on.gedenk::after { visibility: hidden; }
+.coin.coin3d-on.rare-country { box-shadow: 0 0 22px 2px rgba(255, 197, 61, .55); }
+.coin.coin3d-drag { cursor: grab; touch-action: pan-y; }
+.coin.coin3d-drag:active { cursor: grabbing; }
+/* Münzwurf: bis die 3D-Münze bereit ist, nichts zeigen (sonst blitzt der Platzhalter auf) */
+.coin.coin-toss:not(.coin3d-on) { background: none; box-shadow: none; }
+.coin.coin-toss:not(.coin3d-on) > div { visibility: hidden; }
+.coin.coin-toss canvas.coin3d { will-change: transform; filter: drop-shadow(0 14px 18px rgba(0, 0, 0, .5)); }

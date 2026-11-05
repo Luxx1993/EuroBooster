@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Skript zum Herunterladen der EZB Euro-Münz-Bilder.
-Lädt die Bilder von einem GitHub-Repository mit Euro-Münzbildern herunter.
+Skript zum Herunterladen der Euro-Münz-Bilder (Nationalseiten und Gedenkmünzen).
+Die Bilder stammen aus einem GitHub-Repository mit Euro-Münzbildern, nicht von der EZB.
 
 Quelle: https://github.com/lucephile/euro-coin-images
 """
@@ -22,6 +22,7 @@ COUNTRY_MAPPING = {
     'andorre': 'AD',
     'autriche': 'AT',
     'belgique': 'BE',
+    'bulgarie': 'BG',  # seit 1. Januar 2026 im Euroraum
     'chypre': 'CY',
     'croatie': 'HR',
     'espagne': 'ES',
@@ -121,10 +122,10 @@ def copy_coin_images():
             if os.path.isdir(year_path):
                 for filename in os.listdir(year_path):
                     if filename.endswith('.webp'):
-                        # Extrahiere Land aus dem Dateinamen
-                        parts = filename[:-5].split('-')  # Entferne .webp
-                        if len(parts) >= 1:
-                            github_country = parts[0]
+                        # Land aus dem Dateinamen „<land>-<nr>.webp“; Ländernamen
+                        # können selbst Bindestriche enthalten (pays-bas, saint-marin)
+                        github_country = filename[:-5].rsplit('-', 1)[0]
+                        if True:
                             if github_country in COUNTRY_MAPPING:
                                 iso_country = COUNTRY_MAPPING[github_country]
                                 src = os.path.join(year_path, filename)

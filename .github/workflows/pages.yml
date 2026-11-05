@@ -43,6 +43,8 @@ jobs:
           cp -r index.html css js _site/
           # Nur die kleinen Kartenbilder veröffentlichen, nicht die Originale
           cp -r images/cards _site/images/
+          # Münzen: nur die runden Relief-Vorlagen für den 3D-Renderer, nicht die Originale
+          cp -r images/coin_web _site/images/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

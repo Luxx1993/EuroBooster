@@ -167,14 +167,28 @@
     if (c <= 50) return 'nordic';
     return c === 100 ? 'bimetal-1' : 'bimetal-2';
   }
-  function coinHTML(it) {
-    const cls = ['coin', coinClass(it.cents), it.commemorative ? 'gedenk' : '', it.rareCountry ? 'rare-country' : ''].join(' ');
-    return `<div class="${cls}" title="${esc(coinLabel(it.cents) + ' · ' + it.countryName + (it.commemorative ? ' · Gedenkmünze ' + it.commemorative : ''))}">
+  // Bild der Münze: Nationalseite oder Gedenkmünze. Ältere Gedenkmünzen ohne
+  // Bildangabe (aus früheren Spielständen) bleiben gezeichnet.
+  // Relief-Vorlage der Münze (rund freigestellt, scripts/build_coin_web.py).
+  // Ältere Gedenkmünzen ohne Bildangabe bleiben gezeichnet.
+  function coinImage(it) {
+    if (it.img) return `${D.COIN_IMAGES}/${it.img.replace(/\.jpg$/, '.webp')}`;
+    if (it.commemorative) return null;
+    return `${D.COIN_IMAGES}/${it.country}/${it.cents}.webp`;
+  }
+  // mode: static (Album, Ablage), spin (Reveal), wobble (Tausch), tilt (Einzelansicht)
+  function coinHTML(it, opts = {}) {
+    const src = window.Coin3D && window.Coin3D.supported ? coinImage(it) : null;
+    const toss = src && opts.mode === 'toss';
+    const cls = ['coin', coinClass(it.cents), it.commemorative ? 'gedenk' : '', it.rareCountry ? 'rare-country' : '', toss ? 'coin-toss' : ''].join(' ');
+    const label = coinLabel(it.cents) + ' · ' + it.countryName + (it.commemorative ? ' · Gedenkmünze ' + it.commemorative : '');
+    const canvas = src ? `<canvas class="coin3d" role="img" aria-label="${esc(label)}" data-src="${src}" data-cents="${it.cents}" data-mode="${opts.mode || 'static'}"${toss ? ` data-toss="${opts.toss || 'fast'}"` : ''}${opts.drag ? ' data-drag="1"' : ''}></canvas>` : '';
+    return `<div class="${cls}" title="${esc(label)}">${canvas}
       <div><div class="c-flag">${flag(it.country)}</div><div class="c-val">${coinLabel(it.cents)}</div><div class="c-cc">${it.commemorative || it.country}</div></div>
     </div>`;
   }
 
-  function itemHTML(it, opts) { return it.kind === 'coin' ? coinHTML(it) : noteHTML(it, opts); }
+  function itemHTML(it, opts) { return it.kind === 'coin' ? coinHTML(it, opts) : noteHTML(it, opts); }
 
   function packHTML(type, god) {
     const coin = type === 'muenze';
@@ -640,10 +654,7 @@
     const steps = $('#steps');
     const addStep = (html) => { steps.insertAdjacentHTML('beforeend', `<div class="step">${html}</div>`); sfx.drum(); haptic(1); };
     if (coin) {
-      addStep(`<div class="big">${flag(hit.country)}</div><div class="lbl">${esc(hit.countryName)}</div>`);
-      if (!(await wait(1100, !lock)) || !ok()) return;
-      addStep(`<div class="code">${hit.commemorative ? 'GEDENK ' + hit.commemorative : 'UMLAUF'}</div><div class="lbl">Prägung</div>`);
-      if (!(await wait(1100, !lock)) || !ok()) return;
+      // Münzen: kein Stufen-Reveal – das Land soll erst nach dem Wurf feststehen
     } else {
       addStep(`<div class="big">${flag(hit.country)}</div><div class="lbl">Druckland</div>`);
       if (!(await wait(1100, !lock)) || !ok()) return;
@@ -709,11 +720,28 @@
     const title = coin ? `${coinLabel(it.cents)} · ${esc(it.countryName)}` : `${it.denom} € · ${esc(D.MOTIFS[it.theme][it.denom].front)}`;
     const sub = subtitle || (coin ? (it.commemorative ? 'Gedenkmünze ' + it.commemorative : 'Umlaufmünze') : `Entwurf ${it.design} · ${r.name}${it.edition ? ' · ' + editionName(it.edition) : ''}`);
     center.innerHTML = `<div class="reveal ${coin ? 'coin-reveal' : ''}">
-        <div class="flipper face-down">${glow}<div class="face">${itemHTML(it, { extra: it.edition === 'tinte' ? 'print-in' : '' })}</div><div class="card-back">€</div></div>
+        <div class="flipper ${coin ? '' : 'face-down'}">${glow}<div class="face">${itemHTML(it, { extra: it.edition === 'tinte' ? 'print-in' : '', mode: coin ? 'toss' : 'spin', toss: isHit ? 'full' : 'fast' })}</div>${coin ? '' : '<div class="card-back">€</div>'}</div>
         <div class="reveal-label" style="opacity:0;transition:opacity .3s"><div class="r-title">${title}</div><div class="r-sub">${esc(sub)}</div><div>${badgesFor(it)}</div></div>
       </div>`;
     const fl = center.querySelector('.flipper');
     const label = center.querySelector('.reveal-label');
+    // Münzen: Münzwurf. Landung auf der Zahl, dann Umdrehen auf die Bildseite;
+    // erst danach verraten Beschriftung und Badges das Land.
+    if (coin && center.querySelector('canvas.coin3d') && !S.settings.reduceMotion) {
+      const T = window.Coin3D.tossTiming(isHit ? 'full' : 'fast');
+      const at = (ms, fn) => setTimeout(() => { if (myRun === run && center.contains(fl)) fn(); }, ms);
+      at(T.land - 60, () => { sfx.tick(); tone(isHit ? 520 : 760, 0.09, 'triangle', 0.08); haptic(isHit ? 2 : 1); });
+      at(T.turn, () => sfx.flip());
+      at(T.end, () => {
+        label.style.opacity = 1;
+        haptic(it.rareCountry || it.commemorative ? 3 : 1);
+        if (it.rareCountry || it.commemorative) sfx.coin();
+      });
+      if (!(await wait(T.end + 120))) return;
+      label.style.opacity = 1;
+      if (holdMs) await wait(holdMs);
+      return;
+    }
     // Verdeckt mit Glühen, dann umdrehen
     await new Promise((res) => setTimeout(res, isHit ? 350 : S.settings.reduceMotion ? 50 : 260));
     if (myRun !== run) return;
@@ -880,7 +908,7 @@
           <div class="coin-grid">${p.ids.map((id, i) => {
             const v = D.COIN_VALUES[i];
             if (!owned.has(id)) return `<div class="coin-slot"><div class="hole">${coinLabel(v)}</div></div>`;
-            return `<button class="coin-slot ${highlightId === id ? 'highlight' : ''}" data-detail="${id}" aria-label="${coinLabel(v)} ${esc(p.title)}" style="position:relative">${owned.get(id) > 1 ? `<span class="count" style="position:absolute;top:-4px;right:-4px;z-index:2;background:var(--magenta);border-radius:999px;padding:0 5px;font-weight:700">×${owned.get(id)}</span>` : ''}${coinHTML(firstOf(id))}</button>`;
+            return `<button class="coin-slot ${highlightId === id ? 'highlight' : ''}" data-detail="${id}" aria-label="${coinLabel(v)} ${esc(p.title)}" style="position:relative">${owned.get(id) > 1 ? `<span class="count" style="position:absolute;top:-4px;right:-4px;z-index:2;background:var(--magenta);border-radius:999px;padding:0 5px;font-weight:700">×${owned.get(id)}</span>` : ''}${coinHTML(firstOf(id), { mode: 'flat' })}</button>`;
           }).join('')}</div></div>`;
       }).join('');
     } else if (albumTab === 'gedenk') {
@@ -889,7 +917,7 @@
       gs.forEach((g) => { (byYear[g.commemorative] = byYear[g.commemorative] || new Map()).set(g.id, g); });
       const years = Object.keys(byYear).sort();
       body.innerHTML = `<div class="album-page"><h3>Zeitleiste</h3><div class="sub">Jedes Land darf zusätzlich Gedenkmotive ausgeben. Wischen zum Blättern.</div>
-        ${years.length ? `<div class="timeline">${years.flatMap((y) => [...byYear[y].values()].map((g) => `<button class="coin-slot" data-detail="${g.id}" style="background:none;border:0"><div style="width:80px;margin:0 auto">${coinHTML(g)}</div><div style="margin-top:6px"><strong>${y}</strong><br>${esc(g.countryName)}</div></button>`)).join('')}</div>`
+        ${years.length ? `<div class="timeline">${years.flatMap((y) => [...byYear[y].values()].map((g) => `<button class="coin-slot" data-detail="${g.id}" style="background:none;border:0"><div style="width:80px;margin:0 auto">${coinHTML(g, { mode: 'flat' })}</div><div style="margin-top:6px"><strong>${y}</strong><br>${esc(g.countryName)}</div></button>`)).join('')}</div>`
           : '<div class="empty-state">Noch keine Gedenkmünze. Sie kommen nur im Hit-Slot des Münz-Boosters.</div>'}</div>`;
     } else if (albumTab === 'tresor') {
       const specials = S.items.filter((i) => i.edition || i.rareSerial);
@@ -920,6 +948,8 @@
   }
   function applyTilt(rx, ry) {
     if (!tiltEl) return;
+    const c3d = tiltEl.querySelector('canvas.coin3d');
+    if (c3d) { window.Coin3D.tilt(c3d, -rx * Math.PI / 180 * 1.6, ry * Math.PI / 180 * 1.6); return; }
     tiltEl.style.transform = `rotateX(${-rx}deg) rotateY(${ry}deg)`;
     tiltEl.style.setProperty('--gx', 50 + ry * 2.2 + '%');
     tiltEl.style.setProperty('--gy', 50 + rx * 2.2 + '%');
@@ -949,11 +979,11 @@
       facts.push(['Exemplare', `${list.length}${list.length > 1 ? ` (zeige ${idx + 1})` : ''}`], ['Gefunden', new Date(it.foundAt).toLocaleString('de-DE')]);
       const title = coin ? `${coinLabel(it.cents)} · ${it.countryName}` : `${it.denom} € · ${D.MOTIFS[it.theme][it.denom].front}`;
       openModal(`<h2>${esc(title)}</h2>
-        <div class="detail-stage" id="detailStage"><div class="tilt ${coin ? 'coin-tilt' : ''}" id="tilt">${coin ? coinHTML(it) : noteHTML(it, { back })}<div class="glare"></div></div></div>
-        ${coin ? '' : `<p class="image-credit" style="text-align:center;margin:-6px 0 12px">Bild: © EZB · Gestaltungsvorschlag ${esc(design.id)}, ${esc(design.designer)}</p>`}
+        <div class="detail-stage" id="detailStage"><div class="tilt ${coin ? 'coin-tilt' : ''}" id="tilt">${coin ? coinHTML(it, { mode: 'tilt', drag: true }) : noteHTML(it, { back })}${coin ? '' : '<div class="glare"></div>'}</div></div>
+        ${coin ? `<p class="image-credit" style="text-align:center;margin:-6px 0 12px">Bild: ${it.commemorative ? 'Gedenkmünze' : 'Nationalseite'} · Motiv des Ausgabelands ${esc(it.countryName)} · Sammlung ${esc(D.COIN_IMAGE_SOURCE)}</p>` : `<p class="image-credit" style="text-align:center;margin:-6px 0 12px">Bild: © EZB · Gestaltungsvorschlag ${esc(design.id)}, ${esc(design.designer)}</p>`}
         <dl class="facts">${facts.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${k === 'Seriennummer' || k === 'Land' || k === 'Druckerei' ? v : esc(v)}</dd>`).join('')}</dl>
         <div class="button-row">
-          ${coin ? '' : '<button class="btn" id="flipBtn">Wenden</button>'}
+          <button class="btn" id="flipBtn">Wenden</button>
           ${list.length > 1 ? '<button class="btn" id="nextEx">Nächstes Exemplar</button><button class="btn hot" id="tradeEx">Tauschen</button>' : ''}
           <button class="btn primary" data-close>Schließen</button>
         </div>`, (card) => {
@@ -967,9 +997,14 @@
         ds.addEventListener('pointerleave', () => applyTilt(0, 0));
         let sx = null;
         ds.addEventListener('pointerdown', (e) => (sx = e.clientX));
-        ds.addEventListener('pointerup', (e) => { if (!coin && sx != null && Math.abs(e.clientX - sx) > 60) { back = !back; draw(); } sx = null; });
+        const flip = () => {
+          const c3d = $('canvas.coin3d', card);
+          if (coin) { if (c3d) window.Coin3D.flip(c3d); return; }
+          back = !back; draw();
+        };
+        ds.addEventListener('pointerup', (e) => { if (!coin && sx != null && Math.abs(e.clientX - sx) > 60) flip(); sx = null; });
         window.addEventListener('deviceorientation', onOrient);
-        const fb = $('#flipBtn', card); if (fb) fb.onclick = () => { back = !back; draw(); };
+        const fb = $('#flipBtn', card); if (fb) fb.onclick = flip;
         const nx = $('#nextEx', card); if (nx) nx.onclick = () => { idx = (idx + 1) % list.length; back = false; draw(); };
         const tx = $('#tradeEx', card); if (tx) tx.onclick = () => openTradeOffer(id);
       });
@@ -985,7 +1020,7 @@
     for (const it of S.items) counts.set(it.id, (counts.get(it.id) || []).concat(it));
     const dups = [...counts.values()].filter((l) => l.length > 1).sort((a, b) => b.length - a.length);
     $('#tradeList').innerHTML = dups.length ? `<div class="album-page"><h3>Deine Doppelten</h3><div class="sub">${dups.reduce((s, l) => s + l.length - 1, 0)} Exemplare zum Tauschen</div>
-      <div class="sleeves">${dups.map((l) => `<button class="sleeve" data-trade="${l[0].id}" aria-label="Tauschen: ${esc(describe(l[0]))}"><span class="count">×${l.length}</span>${l[0].kind === 'coin' ? `<div style="width:80%;margin:0 auto">${coinHTML(l[0])}</div>` : noteHTML(l[0], { hideSerial: true })}</button>`).join('')}</div></div>`
+      <div class="sleeves">${dups.map((l) => `<button class="sleeve" data-trade="${l[0].id}" aria-label="Tauschen: ${esc(describe(l[0]))}"><span class="count">×${l.length}</span>${l[0].kind === 'coin' ? `<div style="width:80%;margin:0 auto">${coinHTML(l[0], { mode: 'flat' })}</div>` : noteHTML(l[0], { hideSerial: true })}</button>`).join('')}</div></div>`
       : '<div class="empty-state">Noch keine Doppelten. Weiter öffnen – rein geldpolitisch betrachtet.</div>';
     $$('#tradeList [data-trade]').forEach((b) => b.addEventListener('click', () => openTradeOffer(b.dataset.trade)));
   }
@@ -1046,7 +1081,7 @@
     const coinish = (it) => it.kind === 'coin';
     const show = (it, cls) => {
       slot.classList.toggle('coinish', coinish(it));
-      slot.innerHTML = `<div class="glow"></div><div class="${cls}">${itemHTML(it)}</div>`;
+      slot.innerHTML = `<div class="glow"></div><div class="${cls}">${itemHTML(it, { mode: 'wobble' })}</div>`;
     };
     ts.hidden = false; actions.hidden = true;
     document.body.style.overflow = 'hidden';

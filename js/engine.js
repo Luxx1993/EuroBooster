@@ -125,30 +125,53 @@
   // ---------------------------------------------------------------------------
   // Münz-Booster (Werte in Cent)
   // ---------------------------------------------------------------------------
+  // Gedenkmünzen gibt es nur als 2 €. Aus dem Verzeichnis echter Münzen
+  // (js/coins.js) wird erst ein Land nach seiner Häufigkeit gewählt, dann
+  // eine seiner Münzen. Ohne Verzeichnis: Land und Jahr zufällig.
+  function makeCommemorative(rng, opts = {}) {
+    const byCode = new Map(D.COIN_COUNTRIES.map((c) => [c.code, c]));
+    let pool = D.COMMEMORATIVES.filter((e) => byCode.has(e[0]) && e[0] !== opts.exclude);
+    if (opts.owned) {
+      const missing = pool.filter((e) => !opts.owned.has(gedenkId(e[0], e[1], e[2])));
+      if (missing.length) pool = missing;
+    }
+    if (!pool.length) {
+      const countries = D.COIN_COUNTRIES.filter((c) => c.code !== opts.exclude);
+      const c = pickWeighted(rng, countries.map((x) => [x, x.weight]));
+      const year = randInt(rng, D.COMMEMORATIVE_YEARS[0], D.COMMEMORATIVE_YEARS[1]);
+      return coinObject(c, 200, { commemorative: year, id: gedenkId(c.code, year) });
+    }
+    const codes = [...new Set(pool.map((e) => e[0]))];
+    const code = pickWeighted(rng, codes.map((cc) => [cc, byCode.get(cc).weight]));
+    const mine = pool.filter((e) => e[0] === code);
+    const [cc, year, nr, file] = mine[randInt(rng, 0, mine.length - 1)];
+    return coinObject(byCode.get(cc), 200, { commemorative: year, gedenkNr: nr, img: 'commemoratives/' + file, id: gedenkId(cc, year, nr) });
+  }
+
+  function coinObject(country, cents, extra = {}) {
+    return Object.assign({
+      kind: 'coin',
+      id: coinId(country.code, cents),
+      cents,
+      country: country.code,
+      countryName: country.name,
+      rareCountry: !!country.rare,
+      commemorative: null,
+      edition: null,
+    }, extra);
+  }
+
   function makeCoin(rng, cents, hit) {
     let country;
-    let commemorative = null;
     if (hit && cents === 200 && rng() < D.COMMEMORATIVE_CHANCE) {
-      // Gedenkmünzen gibt es nur als 2 €, aus jedem Land
-      country = pickWeighted(rng, D.COIN_COUNTRIES.map((c) => [c, c.weight]));
-      commemorative = randInt(rng, D.COMMEMORATIVE_YEARS[0], D.COMMEMORATIVE_YEARS[1]);
+      return Object.assign(makeCommemorative(rng), { hit: true });
     } else if (hit) {
       const pool = D.COIN_COUNTRIES.filter((c) => D.HIT_COUNTRIES.includes(c.code));
       country = pickWeighted(rng, pool.map((c) => [c, c.weight]));
     } else {
       country = pickWeighted(rng, D.COIN_COUNTRIES.map((c) => [c, c.weight]));
     }
-    return {
-      kind: 'coin',
-      id: commemorative ? gedenkId(country.code, commemorative) : coinId(country.code, cents),
-      cents,
-      country: country.code,
-      countryName: country.name,
-      rareCountry: !!country.rare,
-      commemorative,
-      edition: null,
-      hit: !!hit,
-    };
+    return coinObject(country, cents, { hit: !!hit });
   }
 
   function openCoinPack(rng) {
@@ -178,15 +201,10 @@
     }
     // Münzen: gleicher Wert aus einem anderen Land
     const pool = D.COIN_COUNTRIES.filter((c) => c.code !== item.country);
-    if (item.commemorative) {
-      const year = randInt(rng, D.COMMEMORATIVE_YEARS[0], D.COMMEMORATIVE_YEARS[1]);
-      const missing = pool.filter((c) => !owned.has(gedenkId(c.code, year)));
-      const c = pickWeighted(rng, (missing.length ? missing : pool).map((x) => [x, x.weight]));
-      return { kind: 'coin', id: gedenkId(c.code, year), cents: 200, country: c.code, countryName: c.name, rareCountry: !!c.rare, commemorative: year, edition: null };
-    }
+    if (item.commemorative) return makeCommemorative(rng, { exclude: item.country, owned });
     const missing = pool.filter((c) => !owned.has(coinId(c.code, item.cents)));
     const c = pickWeighted(rng, (missing.length ? missing : pool).map((x) => [x, x.weight]));
-    return { kind: 'coin', id: coinId(c.code, item.cents), cents: item.cents, country: c.code, countryName: c.name, rareCountry: !!c.rare, commemorative: null, edition: null };
+    return coinObject(c, item.cents);
   }
 
   // ---------------------------------------------------------------------------
@@ -194,7 +212,7 @@
   // ---------------------------------------------------------------------------
   function noteId(design, denom) { return 'N-' + design + '-' + denom; }
   function coinId(country, cents) { return 'C-' + country + '-' + cents; }
-  function gedenkId(country, year) { return 'G-' + country + '-' + year; }
+  function gedenkId(country, year, nr) { return 'G-' + country + '-' + year + (nr ? '-' + nr : ''); }
 
   // ---------------------------------------------------------------------------
   // Exakte Verteilung des Packwerts (Slots unabhängig)
