@@ -1,6 +1,12 @@
 # EuroBooster – EUROPACK
 
-Pack-Opening-Simulator für die neue Euro-Banknotenserie: Ein Booster kostet 50 € und enthält fünf zufällige Scheine – *Kauf Geld, mit Geld.* Satire-Prototyp mit Spielgeld, kein Produkt der EZB, kein Glücksspielangebot.
+**Kauf Geld, mit Geld.**
+
+Ein Sammelspiel mit den neuen Euro-Banknoten: Ein Booster kostet 50 € und enthält fünf zufällige Scheine, mal 30 €, mal 250 € wert, im Schnitt 45,75 €. Statt Monstern sammelt man Beethoven, Marie Curie und Eisvögel. Dazu kommen die nie gedruckten Entwürfe der EZB als Prototyp-Karten und Münzen aus 25 Ländern. Seltene Seriennummern und Special Editions wie Holo oder Gold machen auch einen 5er zum Highlight. Doppelte tauscht man 1:1, weil es ja Geld ist.
+
+Die Pointe: Ausgerechnet die Zentralbank, die für Preisstabilität sorgt, betreibt die erfolgreichste Lootbox Europas, und die Bank gewinnt immer.
+
+> Satire-Prototyp mit Spielgeld – kein Produkt der EZB, kein echtes Geld, kein Glücksspielangebot.
 
 Das vollständige Konzept steht in [`docs/konzept.md`](docs/konzept.md). Dieser Prototyp setzt die „Variante C – Digital“ als Browser-App um.
 
