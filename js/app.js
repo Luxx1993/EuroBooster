@@ -51,11 +51,23 @@
     try {
       const raw = localStorage.getItem(STORE_KEY);
       if (!raw) return null;
-      const s = JSON.parse(raw);
+      const s = migrate(JSON.parse(raw));
       return Object.assign(fresh(), s, { settings: Object.assign(fresh().settings, s.settings) });
     } catch (e) {
       return null;
     }
+  }
+  // Alte Spielstände: Prototypen werden zu gültigen Scheinen, Albumseiten
+  // heißen jetzt nach dem Entwurf (früher „echt“ = Entwurf C, „proto-X“).
+  function migrate(s) {
+    for (const it of s.items || []) {
+      if (it.kind !== 'proto') continue;
+      const printer = EB.pickWeighted(Math.random, D.PRINTERS.map((x) => [x, x.weight]));
+      Object.assign(it, { kind: 'note', isReal: true, printer: printer.code, printerName: printer.name, country: printer.country },
+        EB.makeSerial(Math.random, printer.code));
+    }
+    if (s.setBonuses) s.setBonuses = s.setBonuses.map((id) => (id === 'echt' ? 'note-C' : id.replace(/^proto-/, 'note-')));
+    return s;
   }
   let S = load() || fresh();
   function save() {
@@ -123,15 +135,21 @@
     const d = it.denom;
     const motifs = D.MOTIFS[it.theme];
     let motif = opts.back ? motifs[d].back : motifs[d].front;
+    let imgDenom = d;
     if (it.edition === 'alt' && !opts.back) {
-      // Alternativmotiv: das Motiv eines Nachbarscheins desselben Themas
+      // Alternativmotiv: das Motiv eines Nachbarscheins desselben Entwurfs
       const i = D.DENOMS.indexOf(d);
-      motif = motifs[D.DENOMS[(i + 3) % 6]].front;
+      imgDenom = D.DENOMS[(i + 3) % 6];
+      motif = motifs[imgDenom].front;
     }
     const design = designById(it.design);
-    const cls = ['note', 'theme-' + it.theme, it.edition ? 'ed-' + it.edition : '', opts.back ? 'back' : '', opts.extra || ''].join(' ');
+    const cls = ['note', 'has-img', 'theme-' + it.theme, it.edition ? 'ed-' + it.edition : '', opts.back ? 'back' : '', opts.extra || ''].join(' ');
     const edLabel = it.edition ? `<span class="ed-label">${esc(editionName(it.edition))}</span>` : '';
+    const src = `${D.CARD_IMAGES}/${it.design}/${imgDenom}_${opts.back ? 'back' : 'front'}.jpg`;
+    // Fällt das Bild aus, bleibt der gezeichnete Platzhalter darunter sichtbar
+    const img = `<img class="n-img" src="${src}" alt="${esc(`${d} € ${motif}, Entwurf ${it.design}`)}" loading="lazy" decoding="async" draggable="false" onerror="this.parentNode.classList.remove('has-img');this.remove()">`;
     return `<div class="${cls}" style="--c:${D.DENOM_COLORS[d]}">
+      ${img}
       <div class="n-denom">${d}<small> €</small></div>
       <div class="n-stars" aria-hidden="true">★ ★ ★ ★ ★</div>
       <div class="n-serial">${opts.hideSerial ? '' : esc(it.serial || '')}</div>
@@ -140,7 +158,6 @@
       <div class="n-motif">${esc(motif)}</div>
       <div class="n-meta">Entwurf ${esc(it.design)} · ${esc(design ? design.designer : '')}</div>
       <div class="n-big" aria-hidden="true">${d}</div>
-      ${it.kind === 'proto' ? '<div class="n-stamp">PROTOTYP</div>' : ''}
       ${edLabel}
     </div>`;
   }
@@ -164,7 +181,7 @@
     return `<div class="pack ${coin ? 'coin-pack' : ''} ${god ? 'god' : ''}">
       <div class="p-crimp top"></div>
       <div><div class="p-euro">€</div><div class="p-name">EUROPACK</div>
-      <div class="p-sub">${coin ? '10 Münzen' : '5 Scheine + Prototyp'}</div></div>
+      <div class="p-sub">${coin ? '10 Münzen' : '5 Scheine'}</div></div>
       <div class="p-crimp bottom"></div>
     </div>`;
   }
@@ -330,7 +347,7 @@
         <div>
           <h3>Schein-Booster</h3>
           <div class="price tabular">${eur(nb.price)}</div>
-          <ul><li>5 Scheine, Hit-Slot ganz hinten</li><li>+ 1 Prototyp-Karte (nie gedruckt)</li><li>Im Schnitt ${fmt.format(evN)} Nennwert · Median ${eur(EB.median(nb))}</li></ul>
+          <ul><li>5 Scheine, Hit-Slot ganz hinten</li><li>Alle 10 EZB-Entwürfe sind gültiges Geld</li><li>Im Schnitt ${fmt.format(evN)} Nennwert · Median ${eur(EB.median(nb))}</li></ul>
           <button class="btn primary" data-action="buy" data-type="schein">Kaufen und öffnen</button>
         </div>
         <details><summary>Offene Quoten pro Slot</summary>${oddsTable(nb, false)}
@@ -546,8 +563,7 @@
 
   function commitPack(pack, result) {
     S.unopened = S.unopened.filter((p) => p.uid !== pack.uid);
-    const all = result.items.concat(result.bonus ? [result.bonus] : []);
-    for (const it of all) {
+    for (const it of result.items) {
       it.isNew = ownedCount(it.id) === 0;
       it.dupCount = ownedCount(it.id);
       S.items.push(Object.assign({}, it, { uid: uid(), foundAt: Date.now(), source: pack.type }));
@@ -568,7 +584,7 @@
   function describe(it) {
     if (it.kind === 'coin') return `${coinLabel(it.cents)} ${it.countryName}${it.commemorative ? ' (Gedenkmünze ' + it.commemorative + ')' : ''}`;
     const m = D.MOTIFS[it.theme][it.denom].front;
-    return `${it.denom} € ${m}${it.edition ? ' · ' + editionName(it.edition) : ''}${it.kind === 'proto' ? ' (Prototyp ' + it.design + ')' : ''}`;
+    return `${it.denom} € ${m} (Entwurf ${it.design})${it.edition ? ' · ' + editionName(it.edition) : ''}`;
   }
 
   async function runOpening(pack, myRun) {
@@ -633,8 +649,8 @@
       if (!(await wait(1100, !lock)) || !ok()) return;
       addStep(`<div class="code">${esc(hit.printer)}</div><div class="lbl">Druckerei ${esc(hit.printerName)}</div>`);
       if (!(await wait(1100, !lock)) || !ok()) return;
-      addStep(`<div class="swatch" style="background:${D.DENOM_COLORS[hit.denom]};color:${D.DENOM_COLORS[hit.denom]}"></div><div class="lbl">Stückelung</div>`);
-      if (!(await wait(1200, !lock)) || !ok()) return;
+      addStep(`<div class="code">${esc(hit.design)}</div><div class="lbl">Entwurf</div><div class="who">${esc(designById(hit.design).designer)}</div>`);
+      if (!(await wait(1300, !lock)) || !ok()) return;
     }
 
     // Hit
@@ -672,14 +688,6 @@
     $('#stageDim').classList.remove('on');
     clearFx();
 
-    // Prototyp-Bonus
-    if (result.bonus) {
-      setHint('Tippen zum Überspringen');
-      await showCard(result.bonus, 1800, myRun, false, 'Diesen Schein gibt es nie wirklich');
-      if (!ok()) return;
-      sendToTray(result.bonus);
-    }
-
     showSummary(result, bonuses);
   }
 
@@ -689,7 +697,6 @@
     else b.push(`<span class="badge dup">Doppelt ×${it.dupCount + 1}</span>`);
     if (it.edition) b.push(`<span class="badge ed">${esc(editionName(it.edition))}</span>`);
     if (it.rareSerial) b.push(`<span class="badge serial">${esc(it.rareSerial)}</span>`);
-    if (it.kind === 'proto') b.push('<span class="badge proto">Prototyp</span>');
     if (it.commemorative) b.push('<span class="badge ed">Gedenkmünze</span>');
     if (it.rareCountry) b.push('<span class="badge serial">Seltenes Land</span>');
     return b.join('');
@@ -700,7 +707,7 @@
     const r = rarityOf(it);
     const glow = r.glow ? `<div class="glow ${r.glow === 'rainbow' ? 'rainbow' : ''}" style="${r.glow === 'rainbow' ? '' : 'background:' + r.glow}"></div>` : '';
     const title = coin ? `${coinLabel(it.cents)} · ${esc(it.countryName)}` : `${it.denom} € · ${esc(D.MOTIFS[it.theme][it.denom].front)}`;
-    const sub = subtitle || (coin ? (it.commemorative ? 'Gedenkmünze ' + it.commemorative : 'Umlaufmünze') : it.kind === 'proto' ? `Prototyp · Entwurf ${it.design}` : `${r.name}${it.edition ? ' · ' + editionName(it.edition) : ''}`);
+    const sub = subtitle || (coin ? (it.commemorative ? 'Gedenkmünze ' + it.commemorative : 'Umlaufmünze') : `Entwurf ${it.design} · ${r.name}${it.edition ? ' · ' + editionName(it.edition) : ''}`);
     center.innerHTML = `<div class="reveal ${coin ? 'coin-reveal' : ''}">
         <div class="flipper face-down">${glow}<div class="face">${itemHTML(it, { extra: it.edition === 'tinte' ? 'print-in' : '' })}</div><div class="card-back">€</div></div>
         <div class="reveal-label" style="opacity:0;transition:opacity .3s"><div class="r-title">${title}</div><div class="r-sub">${esc(sub)}</div><div>${badgesFor(it)}</div></div>
@@ -734,9 +741,8 @@
   // ---------------------------------------------------------------------------
   function showSummary(result, bonuses) {
     tray.innerHTML = ''; setHint(''); clearFx();
-    const all = result.items.concat(result.bonus ? [result.bonus] : []);
     // nach Wert sortieren, Hit in die Mitte
-    const sorted = all.slice().sort((a, b) => itemValue(a) - itemValue(b) || (a.kind === 'proto') - (b.kind === 'proto'));
+    const sorted = result.items.slice().sort((a, b) => itemValue(a) - itemValue(b));
     const top = result.items.reduce((a, b) => (itemValue(b) > itemValue(a) ? b : a));
     const rest = sorted.filter((x) => x !== top);
     const order = [];
@@ -750,7 +756,7 @@
       const isTop = it === top;
       const shift = k * (coin ? 26 : 34);
       return `<div class="fan-item ${coin ? 'coinish' : ''} ${isTop ? 'hit' : ''}" style="transform:translateX(calc(-50% + ${shift}px)) rotate(${k * spread}deg) translateY(${Math.abs(k) * 8}px)">
-        <div class="fan-badges">${it.isNew ? '<span class="badge new">NEU!</span>' : ''}${it.rareSerial ? '<span class="badge serial">Nummer</span>' : ''}${it.kind === 'proto' ? '<span class="badge proto">Prototyp</span>' : ''}${it.edition ? '<span class="badge ed">' + esc(editionName(it.edition)) + '</span>' : ''}</div>
+        <div class="fan-badges">${it.isNew ? '<span class="badge new">NEU!</span>' : ''}${it.rareSerial ? '<span class="badge serial">Nummer</span>' : ''}${it.edition ? '<span class="badge ed">' + esc(editionName(it.edition)) + '</span>' : ''}</div>
         ${itemHTML(it, { hideSerial: true })}</div>`;
     }).join('');
     const v = result.value, p = result.price;
@@ -805,19 +811,16 @@
   // Sammelalbum
   // ---------------------------------------------------------------------------
   const ALBUM_TABS = [
-    ['echt', 'Echte Serie'],
-    ['proto', 'Prototypen'],
+    ['scheine', 'Scheine'],
     ['muenzen', 'Münzen'],
     ['gedenk', 'Gedenkmünzen'],
     ['tresor', 'Tresor'],
   ];
-  let albumTab = 'echt';
+  let albumTab = 'scheine';
   let highlightId = null;
 
   function albumPages() {
-    const winner = designById(D.WINNER_DESIGN);
-    const pages = [{ key: 'echt', id: 'echt', title: `Siegerdesign ${winner.id}`, ids: D.DENOMS.map((d) => EB.noteId(winner.id, d)) }];
-    D.DESIGNS.filter((d) => d.id !== D.WINNER_DESIGN).forEach((d) => pages.push({ key: 'proto', id: 'proto-' + d.id, title: `Entwurf ${d.id}`, ids: D.DENOMS.map((x) => EB.noteId(d.id, x)) }));
+    const pages = D.DESIGNS.map((d) => ({ key: 'scheine', id: 'note-' + d.id, design: d.id, title: `Entwurf ${d.id}`, ids: D.DENOMS.map((x) => EB.noteId(d.id, x)) }));
     D.COIN_COUNTRIES.forEach((c) => pages.push({ key: 'muenzen', id: 'coin-' + c.code, title: c.name, ids: D.COIN_VALUES.map((v) => EB.coinId(c.code, v)) }));
     return pages;
   }
@@ -851,12 +854,12 @@
     const body = $('#albumBody');
     const pages = albumPages().filter((p) => p.key === albumTab);
 
-    if (albumTab === 'echt' || albumTab === 'proto') {
+    if (albumTab === 'scheine') {
       const total = pages.reduce((s, p) => s + p.ids.length, 0);
       const have = pages.reduce((s, p) => s + p.ids.filter((id) => owned.has(id)).length, 0);
-      const winnerNote = albumTab === 'echt' ? `<p class="muted" style="font-size:13px;margin:0 0 8px">Annahme: Entwurf ${D.WINNER_DESIGN} gewinnt. Die EZB entscheidet voraussichtlich im Dezember 2026.</p>` : '';
-      body.innerHTML = winnerNote + progressHTML(albumTab === 'echt' ? 'Echte Serie' : 'Prototypen', have, total) + pages.map((p) => {
-        const d = designById(p.id.replace('proto-', '').replace('echt', D.WINNER_DESIGN));
+      const intro = '<p class="muted" style="font-size:13px;margin:0 0 8px">Digital gibt es keine Druckkosten – alle zehn Entwürfe der EZB sind gültiges Geld.</p>';
+      body.innerHTML = intro + progressHTML('Scheine', have, total) + pages.map((p) => {
+        const d = designById(p.design);
         const complete = p.ids.every((id) => owned.has(id));
         return `<div class="album-page"><h3>${esc(p.title)} ${complete ? '<span class="badge new">Set komplett</span>' : ''}</h3>
           <div class="sub">${esc(d.designer)} · ${d.theme === 'kultur' ? 'Europäische Kultur' : 'Flüsse und Vögel'} · ${esc(d.style)}</div>
@@ -902,7 +905,7 @@
   }
 
   function openAlbumAt(it) {
-    albumTab = it.kind === 'coin' ? (it.commemorative ? 'gedenk' : 'muenzen') : it.kind === 'proto' ? 'proto' : 'echt';
+    albumTab = it.kind === 'coin' ? (it.commemorative ? 'gedenk' : 'muenzen') : 'scheine';
     highlightId = it.id;
     showTab('album');
   }
@@ -947,6 +950,7 @@
       const title = coin ? `${coinLabel(it.cents)} · ${it.countryName}` : `${it.denom} € · ${D.MOTIFS[it.theme][it.denom].front}`;
       openModal(`<h2>${esc(title)}</h2>
         <div class="detail-stage" id="detailStage"><div class="tilt ${coin ? 'coin-tilt' : ''}" id="tilt">${coin ? coinHTML(it) : noteHTML(it, { back })}<div class="glare"></div></div></div>
+        ${coin ? '' : `<p class="image-credit" style="text-align:center;margin:-6px 0 12px">Bild: © EZB · Gestaltungsvorschlag ${esc(design.id)}, ${esc(design.designer)}</p>`}
         <dl class="facts">${facts.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${k === 'Seriennummer' || k === 'Land' || k === 'Druckerei' ? v : esc(v)}</dd>`).join('')}</dl>
         <div class="button-row">
           ${coin ? '' : '<button class="btn" id="flipBtn">Wenden</button>'}
@@ -1104,7 +1108,8 @@
         <label>Bewegung reduzieren<input type="checkbox" data-set="reduceMotion" ${S.settings.reduceMotion ? 'checked' : ''}></label>
         <label>Ausgabelimit pro Tag (€)<input type="number" min="0" step="10" data-set="limit" value="${S.settings.limit}"></label>
       </div>
-      <p class="muted" style="font-size:12px;margin-top:12px">Satire-Prototyp. Kein Produkt der EZB, kein echtes Geld, kein Glücksspielangebot. Motive als Platzhalter mit Motivname und Stückelungsfarbe.</p>
+      <p class="muted" style="font-size:12px;margin-top:12px">Satire-Prototyp. Kein Produkt der EZB, kein echtes Geld, kein Glücksspielangebot.</p>
+      <p class="image-credit">${esc(D.IMAGE_CREDIT)}</p>
       <div class="button-row"><button class="btn" id="resetBtn">Spielstand zurücksetzen</button><button class="btn primary" data-close>Fertig</button></div>`, (card) => {
       $$('[data-set]', card).forEach((inp) => inp.addEventListener('change', () => {
         const k = inp.dataset.set;

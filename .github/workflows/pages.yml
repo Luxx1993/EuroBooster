@@ -39,7 +39,10 @@ jobs:
       - name: Seite zusammenstellen
         run: |
           mkdir _site
+          mkdir -p _site/images
           cp -r index.html css js _site/
+          # Nur die kleinen Kartenbilder veröffentlichen, nicht die Originale
+          cp -r images/cards _site/images/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

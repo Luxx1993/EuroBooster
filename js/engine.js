@@ -84,13 +84,17 @@
   // ---------------------------------------------------------------------------
   // Schein-Booster
   // ---------------------------------------------------------------------------
-  function makeNote(rng, denom, godPack) {
+  function pickDesign(rng) {
+    return pickWeighted(rng, D.DESIGNS.map((d) => [d, D.DESIGN_WEIGHTS[d.id] || 1]));
+  }
+
+  function makeNote(rng, denom, godPack, designId) {
+    const design = designId ? D.DESIGNS.find((d) => d.id === designId) : pickDesign(rng);
     const printer = pickWeighted(rng, D.PRINTERS.map((p) => [p, p.weight]));
-    const design = D.DESIGNS.find((d) => d.id === D.WINNER_DESIGN);
     const { serial, rareSerial } = makeSerial(rng, printer.code);
     return {
       kind: 'note',
-      id: noteId(D.WINNER_DESIGN, denom),
+      id: noteId(design.id, denom),
       denom,
       design: design.id,
       theme: design.theme,
@@ -105,25 +109,6 @@
     };
   }
 
-  function makePrototype(rng, godPack, fixed) {
-    const protos = D.DESIGNS.filter((d) => d.id !== D.WINNER_DESIGN);
-    const design = fixed ? D.DESIGNS.find((d) => d.id === fixed.design)
-      : pickWeighted(rng, protos.map((d) => [d, D.PROTOTYPE_WEIGHTS[d.id] || 1]));
-    const denom = fixed ? fixed.denom : D.DENOMS[randInt(rng, 0, D.DENOMS.length - 1)];
-    return {
-      kind: 'proto',
-      id: noteId(design.id, denom),
-      denom,
-      design: design.id,
-      theme: design.theme,
-      motif: D.MOTIFS[design.theme][denom],
-      edition: rollEdition(rng, godPack),
-      serial: 'PROTO-' + design.id + '-' + String(randInt(rng, 0, 99999)).padStart(5, '0'),
-      rareSerial: null,
-      isReal: false,
-    };
-  }
-
   function openNotePack(rng) {
     rng = rng || Math.random;
     const godPack = rng() < D.GOD_PACK_CHANCE;
@@ -133,9 +118,8 @@
       note.hit = i === D.NOTE_BOOSTER.slots.length - 1;
       return note;
     });
-    const bonus = D.NOTE_BOOSTER.prototypeBonus ? makePrototype(rng, godPack) : null;
     const value = items.reduce((s, n) => s + n.denom, 0);
-    return { type: 'schein', price: D.NOTE_BOOSTER.price, items, bonus, value, godPack };
+    return { type: 'schein', price: D.NOTE_BOOSTER.price, items, value, godPack };
   }
 
   // ---------------------------------------------------------------------------
@@ -175,7 +159,7 @@
       return coin;
     });
     const value = items.reduce((s, c) => s + c.cents, 0) / 100;
-    return { type: 'muenze', price: D.COIN_BOOSTER.price, items, bonus: null, value, godPack: false };
+    return { type: 'muenze', price: D.COIN_BOOSTER.price, items, value, godPack: false };
   }
 
   // ---------------------------------------------------------------------------
@@ -187,18 +171,10 @@
     const owned = ownedIds || new Set();
     const pick = (arr) => arr[randInt(rng, 0, arr.length - 1)];
     if (item.kind === 'note') {
-      // Gleiche Stückelung, andere Druckerei und Seriennummer, vielleicht eine Edition
-      return makeNote(rng, item.denom, false);
-    }
-    if (item.kind === 'proto') {
-      const all = [];
-      for (const d of D.DESIGNS) {
-        if (d.id === D.WINNER_DESIGN) continue;
-        for (const denom of D.DENOMS) all.push({ design: d.id, denom });
-      }
-      const others = all.filter((x) => noteId(x.design, x.denom) !== item.id);
-      const missing = others.filter((x) => !owned.has(noteId(x.design, x.denom)));
-      return makePrototype(rng, false, pick(missing.length ? missing : others));
+      // Gleiche Stückelung, anderer Entwurf – bevorzugt einer, der noch fehlt
+      const others = D.DESIGNS.filter((d) => d.id !== item.design);
+      const missing = others.filter((d) => !owned.has(noteId(d.id, item.denom)));
+      return makeNote(rng, item.denom, false, pick(missing.length ? missing : others).id);
     }
     // Münzen: gleicher Wert aus einem anderen Land
     const pool = D.COIN_COUNTRIES.filter((c) => c.code !== item.country);
