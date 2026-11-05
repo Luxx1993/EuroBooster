@@ -908,7 +908,7 @@
           <div class="coin-grid">${p.ids.map((id, i) => {
             const v = D.COIN_VALUES[i];
             if (!owned.has(id)) return `<div class="coin-slot"><div class="hole">${coinLabel(v)}</div></div>`;
-            return `<button class="coin-slot ${highlightId === id ? 'highlight' : ''}" data-detail="${id}" aria-label="${coinLabel(v)} ${esc(p.title)}" style="position:relative">${owned.get(id) > 1 ? `<span class="count" style="position:absolute;top:-4px;right:-4px;z-index:2;background:var(--magenta);border-radius:999px;padding:0 5px;font-weight:700">×${owned.get(id)}</span>` : ''}${coinHTML(firstOf(id), { drag: true })}</button>`;
+            return `<button class="coin-slot ${highlightId === id ? 'highlight' : ''}" data-detail="${id}" aria-label="${coinLabel(v)} ${esc(p.title)}" style="position:relative">${owned.get(id) > 1 ? `<span class="count" style="position:absolute;top:-4px;right:-4px;z-index:2;background:var(--magenta);border-radius:999px;padding:0 5px;font-weight:700">×${owned.get(id)}</span>` : ''}${coinHTML(firstOf(id), { mode: 'flat' })}</button>`;
           }).join('')}</div></div>`;
       }).join('');
     } else if (albumTab === 'gedenk') {
@@ -917,7 +917,7 @@
       gs.forEach((g) => { (byYear[g.commemorative] = byYear[g.commemorative] || new Map()).set(g.id, g); });
       const years = Object.keys(byYear).sort();
       body.innerHTML = `<div class="album-page"><h3>Zeitleiste</h3><div class="sub">Jedes Land darf zusätzlich Gedenkmotive ausgeben. Wischen zum Blättern.</div>
-        ${years.length ? `<div class="timeline">${years.flatMap((y) => [...byYear[y].values()].map((g) => `<button class="coin-slot" data-detail="${g.id}" style="background:none;border:0"><div style="width:80px;margin:0 auto">${coinHTML(g, { drag: true })}</div><div style="margin-top:6px"><strong>${y}</strong><br>${esc(g.countryName)}</div></button>`)).join('')}</div>`
+        ${years.length ? `<div class="timeline">${years.flatMap((y) => [...byYear[y].values()].map((g) => `<button class="coin-slot" data-detail="${g.id}" style="background:none;border:0"><div style="width:80px;margin:0 auto">${coinHTML(g, { mode: 'flat' })}</div><div style="margin-top:6px"><strong>${y}</strong><br>${esc(g.countryName)}</div></button>`)).join('')}</div>`
           : '<div class="empty-state">Noch keine Gedenkmünze. Sie kommen nur im Hit-Slot des Münz-Boosters.</div>'}</div>`;
     } else if (albumTab === 'tresor') {
       const specials = S.items.filter((i) => i.edition || i.rareSerial);
@@ -1020,7 +1020,7 @@
     for (const it of S.items) counts.set(it.id, (counts.get(it.id) || []).concat(it));
     const dups = [...counts.values()].filter((l) => l.length > 1).sort((a, b) => b.length - a.length);
     $('#tradeList').innerHTML = dups.length ? `<div class="album-page"><h3>Deine Doppelten</h3><div class="sub">${dups.reduce((s, l) => s + l.length - 1, 0)} Exemplare zum Tauschen</div>
-      <div class="sleeves">${dups.map((l) => `<button class="sleeve" data-trade="${l[0].id}" aria-label="Tauschen: ${esc(describe(l[0]))}"><span class="count">×${l.length}</span>${l[0].kind === 'coin' ? `<div style="width:80%;margin:0 auto">${coinHTML(l[0])}</div>` : noteHTML(l[0], { hideSerial: true })}</button>`).join('')}</div></div>`
+      <div class="sleeves">${dups.map((l) => `<button class="sleeve" data-trade="${l[0].id}" aria-label="Tauschen: ${esc(describe(l[0]))}"><span class="count">×${l.length}</span>${l[0].kind === 'coin' ? `<div style="width:80%;margin:0 auto">${coinHTML(l[0], { mode: 'flat' })}</div>` : noteHTML(l[0], { hideSerial: true })}</button>`).join('')}</div></div>`
       : '<div class="empty-state">Noch keine Doppelten. Weiter öffnen – rein geldpolitisch betrachtet.</div>';
     $$('#tradeList [data-trade]').forEach((b) => b.addEventListener('click', () => openTradeOffer(b.dataset.trade)));
   }

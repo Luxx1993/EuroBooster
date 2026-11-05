@@ -368,20 +368,27 @@ void main() {
   const live = new Set();
 
   // Drehung von Hand: Schwung nach dem Loslassen, dann auf die nähere Seite einrasten
+  // Zeitbasiert (f = Anzahl 60-Hz-Frames seit dem letzten Aufruf), damit
+  // Schwung und Einrasten auf langsamen Geräten genauso lange dauern.
   function userSpin(st) {
+    const now = performance.now();
+    const f = Math.min(6, Math.max(0, (now - (st.lastSpin || now)) / (1000 / 60)));
+    st.lastSpin = now;
     if (!st.dragging && st.v) {
-      st.spin = (st.spin || 0) + st.v;
-      st.v *= 0.94;
+      st.spin = (st.spin || 0) + st.v * f;
+      st.v *= Math.pow(0.94, f);
       if (Math.abs(st.v) < 0.004) { st.v = 0; st.snap = true; }
     }
     if (!st.dragging && st.snap) {
       const target = Math.round((st.spin || 0) / Math.PI) * Math.PI;
-      st.spin += (target - st.spin) * 0.16;
+      st.spin += (target - st.spin) * (1 - Math.pow(1 - 0.16, f));
       if (Math.abs(target - st.spin) < 0.002) { st.spin = target; st.snap = false; }
     }
     return st.spin || 0;
   }
   const settled = (st) => !st.dragging && !st.v && !st.snap;
+  // Unbewegte Münzen werden einmal gerendert und nicht animiert
+  const still = (c) => c.dataset.mode === 'static' || c.dataset.mode === 'flat';
 
   // Münzwurf beim Öffnen: von unten hereingeworfen, landet auf der Zahl
   // (für alle Länder gleich), bleibt kurz liegen und dreht sich dann auf die
@@ -440,6 +447,8 @@ void main() {
     const mode = canvas.dataset.mode;
     if (mode === 'toss' && !reduceMotion()) return tossPose(canvas, t);
     const spin = userSpin(st);
+    // flat: gerade von vorn auf die Bildseite, unbewegt (Album)
+    if (mode === 'flat') return { rx: 0, ry: st.flip ? Math.PI : 0, lx: -0.35, ly: 0.6 };
     if (mode === 'static' || reduceMotion()) {
       return Object.assign({}, STATIC_POSE, { ry: STATIC_POSE.ry + (st.flip ? Math.PI : 0) + spin });
     }
@@ -472,7 +481,7 @@ void main() {
       const st = canvas._coin;
       if (st.front && st.back) draw(canvas, st.spec, pose(canvas, now), st.front, st.back);
       // Ruhende Album-Münzen verlassen die Animation wieder
-      if (canvas.dataset.mode === 'static' && settled(st)) live.delete(canvas);
+      if (still(canvas) && settled(st)) live.delete(canvas);
     }
     if (live.size && (!reduceMotion() || [...live].some((c) => !settled(c._coin)))) raf = requestAnimationFrame(loop);
   }
@@ -490,7 +499,7 @@ void main() {
       st.start = performance.now();
       canvas.parentNode && canvas.parentNode.classList.add('coin3d-on');
       if (canvas.dataset.drag) enableDrag(canvas);
-      if (canvas.dataset.mode === 'static') draw(canvas, spec, pose(canvas, performance.now()), front, back);
+      if (still(canvas)) draw(canvas, spec, pose(canvas, performance.now()), front, back);
       else { live.add(canvas); kick(); }
     }).catch(() => {
       // Platzhalter bleibt sichtbar
@@ -553,7 +562,7 @@ void main() {
     const list = root.matches && root.matches('canvas.coin3d') ? [root] : root.querySelectorAll ? root.querySelectorAll('canvas.coin3d') : [];
     for (const c of list) {
       if (c._coin || c._observed) continue;
-      if (c.dataset.mode === 'static' && io) { c._observed = true; io.observe(c); } else setup(c);
+      if (still(c) && io) { c._observed = true; io.observe(c); } else setup(c);
     }
   }
 
@@ -574,7 +583,7 @@ void main() {
     flip(canvas) {
       if (!canvas || !canvas._coin) return;
       canvas._coin.flip = !canvas._coin.flip;
-      if (canvas.dataset.mode === 'static' && canvas._coin.front) draw(canvas, canvas._coin.spec, pose(canvas, performance.now()), canvas._coin.front, canvas._coin.back);
+      if (still(canvas) && canvas._coin.front) draw(canvas, canvas._coin.spec, pose(canvas, performance.now()), canvas._coin.front, canvas._coin.back);
       kick();
     },
   };
