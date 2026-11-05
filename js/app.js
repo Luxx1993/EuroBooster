@@ -146,7 +146,6 @@
       <div class="n-motif">${esc(motif)}</div>
       <div class="n-meta">Entwurf ${esc(it.design)} · ${esc(design ? design.designer : '')}</div>
       <div class="n-big" aria-hidden="true">${d}</div>
-      ${it.kind === 'proto' ? '<div class="n-stamp">PROTOTYP</div>' : ''}
       ${edLabel}
     </div>`;
   }

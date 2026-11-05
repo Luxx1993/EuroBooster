@@ -153,11 +153,6 @@ button { font: inherit; color: inherit; cursor: pointer; }
 }
 .note.theme-natur .n-portrait { border-radius: 40% 60% 55% 45%; }
 .note .n-stars { position: absolute; left: 8%; top: 53%; font-size: .7em; letter-spacing: .1em; color: #2a3bd0; opacity: .75; }
-.note .n-stamp {
-  position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%) rotate(-24deg);
-  border: 2px solid #c0263a; color: #c0263a; font-family: var(--font-head); font-weight: 700;
-  padding: 2px 8px; border-radius: 6px; font-size: .8em; letter-spacing: .1em; opacity: .85; background: rgba(255,255,255,.55); z-index: 1;
-}
 .note .n-holo-strip {
   position: absolute; left: 0; right: 0; top: 49%; height: 3.5%;
   background: linear-gradient(90deg, #d8e7ff, #f6d6f0, #d6fff1, #fff2c7, #d8e7ff);
@@ -510,7 +505,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
   z-index: 3; top: 3%; right: 3%; padding: .5em .25em; border-radius: .5em;
   background: rgba(255, 255, 255, .82); color: var(--ink);
 }
-.note.has-img .n-stamp, .note.has-img .ed-label { z-index: 3; }
+.note.has-img .ed-label { z-index: 3; }
 /* Editionen auf echten Bildern */
 .note.has-img.ed-gold .n-img { filter: sepia(.9) saturate(2.2) hue-rotate(-12deg) brightness(1.08) contrast(1.05); }
 .note.has-img.ed-fehldruck .n-img {
