@@ -294,7 +294,7 @@ Nach dem Opening zeigt eine Übersicht alle neuen Scheine auf einen Blick; im Sa
 
 **Einzelansicht eines Scheins**
 
-- Vollbild mit Holo-Effekt, der der Handy-Neigung folgt; Wenden per Wischen zeigt die Rückseite.
+- Großansicht, gerade und ohne Mitkippen; „Wenden“ (bei Scheinen auch Wischen) zeigt die Rückseite, Münzen lassen sich per Ziehen 360° drehen.
 - Zoom bis auf Mikroschrift und Guilloche.
 - Steckbrief: Motiv, Entwurf und Designer, Seriennummer, Druckerei, Edition, Anzahl Doppelte, Fundzeitpunkt.
 - Fortschritt als Balken, z. B. „Scheine 23/60“; Set-Bonus erscheint, sobald die Seite eines Entwurfs voll ist.

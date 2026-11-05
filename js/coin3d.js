@@ -9,7 +9,7 @@
  * in deren 2D-Canvas – so gehen auch 200 Münzen im Album.
  *
  * Verwendung: <canvas class="coin3d" data-src="…" data-cents="200"
- *   data-mode="static|spin|wobble|tilt"> – wird automatisch gefunden.
+ *   data-mode="flat|static|toss|wobble" [data-drag="1"]> – wird automatisch gefunden.
  * Ohne WebGL oder wenn das Bild nicht lädt, bleibt der gezeichnete
  * Platzhalter im umgebenden .coin sichtbar.
  */
@@ -374,6 +374,7 @@ void main() {
     const now = performance.now();
     const f = Math.min(6, Math.max(0, (now - (st.lastSpin || now)) / (1000 / 60)));
     st.lastSpin = now;
+    st.f = f;
     if (!st.dragging && st.v) {
       st.spin = (st.spin || 0) + st.v * f;
       st.v *= Math.pow(0.94, f);
@@ -386,7 +387,7 @@ void main() {
     }
     return st.spin || 0;
   }
-  const settled = (st) => !st.dragging && !st.v && !st.snap;
+  const settled = (st) => !st.dragging && !st.v && !st.snap && (st.flipAngle || 0) === (st.flip ? Math.PI : 0);
   // Unbewegte Münzen werden einmal gerendert und nicht animiert
   const still = (c) => c.dataset.mode === 'static' || c.dataset.mode === 'flat';
 
@@ -448,7 +449,12 @@ void main() {
     if (mode === 'toss' && !reduceMotion()) return tossPose(canvas, t);
     const spin = userSpin(st);
     // flat: gerade von vorn auf die Bildseite, unbewegt (Album)
-    if (mode === 'flat') return { rx: 0, ry: st.flip ? Math.PI : 0, lx: -0.35, ly: 0.6 };
+    if (mode === 'flat') {
+      // „Wenden“ dreht sichtbar um, Ziehen dreht frei (falls erlaubt)
+      st.flipAngle = (st.flipAngle || 0) + ((st.flip ? Math.PI : 0) - (st.flipAngle || 0)) * (1 - Math.pow(1 - 0.16, st.f || 1));
+      if (Math.abs((st.flip ? Math.PI : 0) - st.flipAngle) < 0.002) st.flipAngle = st.flip ? Math.PI : 0;
+      return { rx: 0, ry: st.flipAngle + spin, lx: -0.35, ly: 0.6 };
+    }
     if (mode === 'static' || reduceMotion()) {
       return Object.assign({}, STATIC_POSE, { ry: STATIC_POSE.ry + (st.flip ? Math.PI : 0) + spin });
     }
@@ -460,13 +466,6 @@ void main() {
       const ease = 1 - Math.pow(1 - k, 3);
       ry += (1 - ease) * Math.PI * 6;
       rx += (1 - ease) * 0.5;
-    }
-    if (mode === 'tilt') {
-      // folgt Finger oder Neigung, gedämpft
-      st.tx = (st.tx || 0) + ((st.targetX || 0) - (st.tx || 0)) * 0.12;
-      st.ty = (st.ty || 0) + ((st.targetY || 0) - (st.ty || 0)) * 0.12;
-      rx = st.tx + 0.06 * Math.sin(t * 0.8);
-      ry = st.ty + 0.08 * Math.sin(t * 0.6);
     }
     st.flipAngle = (st.flipAngle || 0) + ((st.flip ? Math.PI : 0) - (st.flipAngle || 0)) * 0.14;
     ry += st.flipAngle + spin;
@@ -578,12 +577,10 @@ void main() {
       const r = tossTiming(kind);
       return { land: r.land * 1000, turn: r.turn * 1000, end: r.end * 1000 };
     },
-    // Ziel für Neigung (Bogenmaß) und Wenden setzen
-    tilt(canvas, x, y) { if (canvas && canvas._coin) { canvas._coin.targetX = x; canvas._coin.targetY = y; kick(); } },
     flip(canvas) {
       if (!canvas || !canvas._coin) return;
       canvas._coin.flip = !canvas._coin.flip;
-      if (still(canvas) && canvas._coin.front) draw(canvas, canvas._coin.spec, pose(canvas, performance.now()), canvas._coin.front, canvas._coin.back);
+      if (canvas._coin.front) live.add(canvas);  // Umdrehen animieren, danach ruht die Münze wieder
       kick();
     },
   };
