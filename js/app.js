@@ -123,15 +123,21 @@
     const d = it.denom;
     const motifs = D.MOTIFS[it.theme];
     let motif = opts.back ? motifs[d].back : motifs[d].front;
+    let imgDenom = d;
     if (it.edition === 'alt' && !opts.back) {
-      // Alternativmotiv: das Motiv eines Nachbarscheins desselben Themas
+      // Alternativmotiv: das Motiv eines Nachbarscheins desselben Entwurfs
       const i = D.DENOMS.indexOf(d);
-      motif = motifs[D.DENOMS[(i + 3) % 6]].front;
+      imgDenom = D.DENOMS[(i + 3) % 6];
+      motif = motifs[imgDenom].front;
     }
     const design = designById(it.design);
-    const cls = ['note', 'theme-' + it.theme, it.edition ? 'ed-' + it.edition : '', opts.back ? 'back' : '', opts.extra || ''].join(' ');
+    const cls = ['note', 'has-img', 'theme-' + it.theme, it.edition ? 'ed-' + it.edition : '', opts.back ? 'back' : '', opts.extra || ''].join(' ');
     const edLabel = it.edition ? `<span class="ed-label">${esc(editionName(it.edition))}</span>` : '';
+    const src = `${D.CARD_IMAGES}/${it.design}/${imgDenom}_${opts.back ? 'back' : 'front'}.jpg`;
+    // Fällt das Bild aus, bleibt der gezeichnete Platzhalter darunter sichtbar
+    const img = `<img class="n-img" src="${src}" alt="${esc(`${d} € ${motif}, Entwurf ${it.design}`)}" loading="lazy" decoding="async" draggable="false" onerror="this.parentNode.classList.remove('has-img');this.remove()">`;
     return `<div class="${cls}" style="--c:${D.DENOM_COLORS[d]}">
+      ${img}
       <div class="n-denom">${d}<small> €</small></div>
       <div class="n-stars" aria-hidden="true">★ ★ ★ ★ ★</div>
       <div class="n-serial">${opts.hideSerial ? '' : esc(it.serial || '')}</div>
@@ -947,6 +953,7 @@
       const title = coin ? `${coinLabel(it.cents)} · ${it.countryName}` : `${it.denom} € · ${D.MOTIFS[it.theme][it.denom].front}`;
       openModal(`<h2>${esc(title)}</h2>
         <div class="detail-stage" id="detailStage"><div class="tilt ${coin ? 'coin-tilt' : ''}" id="tilt">${coin ? coinHTML(it) : noteHTML(it, { back })}<div class="glare"></div></div></div>
+        ${coin ? '' : `<p class="image-credit" style="text-align:center;margin:-6px 0 12px">Bild: © EZB · Gestaltungsvorschlag ${esc(design.id)}, ${esc(design.designer)}</p>`}
         <dl class="facts">${facts.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${k === 'Seriennummer' || k === 'Land' || k === 'Druckerei' ? v : esc(v)}</dd>`).join('')}</dl>
         <div class="button-row">
           ${coin ? '' : '<button class="btn" id="flipBtn">Wenden</button>'}
@@ -1104,7 +1111,8 @@
         <label>Bewegung reduzieren<input type="checkbox" data-set="reduceMotion" ${S.settings.reduceMotion ? 'checked' : ''}></label>
         <label>Ausgabelimit pro Tag (€)<input type="number" min="0" step="10" data-set="limit" value="${S.settings.limit}"></label>
       </div>
-      <p class="muted" style="font-size:12px;margin-top:12px">Satire-Prototyp. Kein Produkt der EZB, kein echtes Geld, kein Glücksspielangebot. Motive als Platzhalter mit Motivname und Stückelungsfarbe.</p>
+      <p class="muted" style="font-size:12px;margin-top:12px">Satire-Prototyp. Kein Produkt der EZB, kein echtes Geld, kein Glücksspielangebot.</p>
+      <p class="image-credit">${esc(D.IMAGE_CREDIT)}</p>
       <div class="button-row"><button class="btn" id="resetBtn">Spielstand zurücksetzen</button><button class="btn primary" data-close>Fertig</button></div>`, (card) => {
       $$('[data-set]', card).forEach((inp) => inp.addEventListener('change', () => {
         const k = inp.dataset.set;

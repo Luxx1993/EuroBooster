@@ -495,3 +495,26 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .reduce-motion .trade-in { animation: fade-in .3s ease both !important; }
 @keyframes fade-out { to { opacity: 0; } }
 @keyframes fade-in { from { opacity: 0; } }
+
+/* ---------- Echte Entwurfsbilder in den Karten ---------- */
+.note .n-img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; display: block; z-index: 0;
+  -webkit-user-drag: none; pointer-events: none;
+}
+.note.has-img > .n-denom, .note.has-img > .n-stars, .note.has-img > .n-portrait,
+.note.has-img > .n-holo-strip, .note.has-img > .n-motif, .note.has-img > .n-meta,
+.note.has-img > .n-big { display: none; }
+.note.has-img::after { opacity: .1; }
+.note.has-img .n-serial:not(:empty) {
+  z-index: 3; top: 3%; right: 3%; padding: .5em .25em; border-radius: .5em;
+  background: rgba(255, 255, 255, .82); color: var(--ink);
+}
+.note.has-img .n-stamp, .note.has-img .ed-label { z-index: 3; }
+/* Editionen auf echten Bildern */
+.note.has-img.ed-gold .n-img { filter: sepia(.9) saturate(2.2) hue-rotate(-12deg) brightness(1.08) contrast(1.05); }
+.note.has-img.ed-fehldruck .n-img {
+  transform: translate(3%, -1.5%);
+  filter: drop-shadow(-4px 2px 0 rgba(233, 92, 192, .55)) drop-shadow(3px -1px 0 rgba(111, 227, 195, .6));
+}
+.image-credit { font-size: 11px; color: var(--muted); line-height: 1.4; }

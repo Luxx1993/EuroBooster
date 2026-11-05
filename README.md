@@ -46,6 +46,10 @@ js/data.js          Katalog, Quoten, Editionen – hier wird feinjustiert
 js/engine.js        Zufall und Pack-Logik ohne DOM, in Node testbar
 js/app.js           Oberfläche, Opening-Ablauf, Album, Spielstand
 test/engine.test.js Prüft die Zahlen aus dem Konzept
+test/images.test.js Prüft, dass jede Karte ein Bild hat
+images/designs/     EZB-Originale (120 Bilder, nur im Repo, nicht online)
+images/cards/       Kartenbilder im Hochformat, 400 × 760 px, für die App
+scripts/            Download der Originale, Erzeugen der Kartenbilder
 docs/konzept.md     Konzept und App-Spezifikation
 ```
 
@@ -63,5 +67,9 @@ Der Test rechnet die Verteilung exakt aus und prüft die Zahlen aus dem Konzept:
 - **Prototyp-Seltenheit:** Gleichverteilt, bis das Umfrageergebnis bekannt ist (`PROTOTYPE_WEIGHTS`).
 - **Farben der Stückelungen:** Farbcodes der heutigen Serie.
 - **Format:** Alle Scheine werden hochkant dargestellt, wie bei den Hochformat-Entwürfen D, G, I und J.
-- **Bilder:** Die echten EZB-Design-Entwürfe sind nun in `images/designs/design_[A-J]/` verfügbar (120 Bilder: 10 Designs × 6 Stückelungen × 2 Seiten). Die App verwendet weiterhin Platzhalter, aber die Bilder können für erweiterte Funktionen genutzt werden.
+- **Bilder:** Die Karten zeigen die echten Gestaltungsvorschläge der EZB, verwendet im Rahmen redaktioneller Berichterstattung. `scripts/build_card_images.py` erzeugt aus den Originalen in `images/designs/` die Kartenbilder in `images/cards/`: Querformat-Entwürfe werden um 90° gedreht, alle auf 1:1,9 zugeschnitten. Online veröffentlicht werden nur die Kartenbilder. Fehlt ein Bild, zeigt die Karte den gezeichneten Platzhalter.
 - **Wirtschaft:** Der Nennwert der Inhalte wird dem Guthaben gutgeschrieben, das Exemplar landet im Album. So kostet ein Schein-Booster im Schnitt 4,25 €.
+
+## Bildnachweis
+
+Banknotenmotive: © Europäische Zentralbank, [Gestaltungsvorschläge für die künftigen Euro-Banknoten](https://www.ecb.europa.eu/euro/banknotes/future_banknotes/html/design-proposals.de.html) (2026), Entwürfe A–J der jeweils genannten Gestalterinnen und Gestalter. Verwendet im Rahmen redaktioneller Berichterstattung; für die Karten auf Hochformat zugeschnitten und Querformat-Entwürfe gedreht. Die Entwürfe sind kein gesetzliches Zahlungsmittel.
