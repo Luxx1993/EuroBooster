@@ -58,9 +58,10 @@ float height(sampler2D t, vec2 uv) {
 
 vec3 env(vec3 r) {
   // Studio-Licht: dunkler Raum, heller Himmel, zwei Softboxen
-  vec3 c = mix(vec3(0.05, 0.06, 0.10), vec3(0.55, 0.58, 0.68), smoothstep(-0.2, 0.9, r.y));
-  c += vec3(1.2) * pow(max(dot(r, normalize(vec3(-0.5, 0.55, 0.65))), 0.0), 24.0);
-  c += vec3(0.7, 0.75, 0.9) * pow(max(dot(r, normalize(vec3(0.7, -0.2, 0.7))), 0.0), 16.0);
+  vec3 c = mix(vec3(0.14, 0.15, 0.19), vec3(0.72, 0.74, 0.80), smoothstep(-0.3, 0.8, r.y));
+  c += vec3(1.3) * pow(max(dot(r, normalize(vec3(-0.5, 0.55, 0.65))), 0.0), 20.0);
+  c += vec3(0.8, 0.83, 0.95) * pow(max(dot(r, normalize(vec3(0.7, -0.2, 0.7))), 0.0), 14.0);
+  c += vec3(0.18) * pow(max(dot(r, vec3(0.0, 0.0, 1.0)), 0.0), 6.0);   // Frontlicht
   return c;
 }
 
@@ -117,11 +118,11 @@ void main() {
     if (front) {
       g = vec2(height(uFront, uv + vec2(e, 0.0)) - height(uFront, uv - vec2(e, 0.0)),
                height(uFront, uv - vec2(0.0, e)) - height(uFront, uv + vec2(0.0, e)));
-      patina = 0.55 + 0.9 * lum(uFront, uv, 0.5);
+      patina = 0.66 + 0.6 * lum(uFront, uv, 0.5);
     } else {
       g = vec2(lum(uBack, uv + vec2(e, 0.0), 0.0) - lum(uBack, uv - vec2(e, 0.0), 0.0),
                lum(uBack, uv - vec2(0.0, e), 0.0) - lum(uBack, uv + vec2(0.0, e), 0.0));
-      patina = 0.85 + 0.25 * lum(uBack, uv, 0.0);
+      patina = 0.72 + 0.4 * lum(uBack, uv, 0.0);
       g *= 0.6;
     }
     if (!front) g.x = -g.x;
@@ -142,12 +143,15 @@ void main() {
   float diff = max(dot(nw, l), 0.0);
   vec3 rr = reflect(-v, nw);
   float fres = pow(1.0 - max(dot(nw, v), 0.0), 3.0);
-  vec3 col = albedo * patina * (0.18 + 0.42 * diff)
-           + albedo * env(rr) * 0.75
+  vec3 col = albedo * patina * (0.28 + 0.52 * diff)
+           + albedo * patina * env(rr) * 0.72
            + mix(albedo, vec3(1.0), 0.5) * pow(max(dot(rr, l), 0.0), 60.0) * 1.3
            + fres * vec3(0.25);
-  col = col / (col + vec3(0.85)) * 1.55;          // weiche Tonkurve
-  gl_FragColor = vec4(pow(col, vec3(0.92)), 1.0);
+  col = col / (col + vec3(0.8)) * 1.65;           // weiche Tonkurve
+  // Sättigung leicht anheben, damit Kupfer und Gold nicht ausbleichen
+  float gray = dot(col, vec3(0.299, 0.587, 0.114));
+  col = mix(vec3(gray), col, 1.15);
+  gl_FragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
 }`;
 
   // -------------------------------------------------------------------------
@@ -363,12 +367,29 @@ void main() {
   const STATIC_POSE = { rx: 0.42, ry: -0.38, lx: -0.5, ly: 0.6 };
   const live = new Set();
 
+  // Drehung von Hand: Schwung nach dem Loslassen, dann auf die nähere Seite einrasten
+  function userSpin(st) {
+    if (!st.dragging && st.v) {
+      st.spin = (st.spin || 0) + st.v;
+      st.v *= 0.94;
+      if (Math.abs(st.v) < 0.004) { st.v = 0; st.snap = true; }
+    }
+    if (!st.dragging && st.snap) {
+      const target = Math.round((st.spin || 0) / Math.PI) * Math.PI;
+      st.spin += (target - st.spin) * 0.16;
+      if (Math.abs(target - st.spin) < 0.002) { st.spin = target; st.snap = false; }
+    }
+    return st.spin || 0;
+  }
+  const settled = (st) => !st.dragging && !st.v && !st.snap;
+
   function pose(canvas, now) {
     const st = canvas._coin;
     const t = (now - st.start) / 1000;
     const mode = canvas.dataset.mode;
+    const spin = userSpin(st);
     if (mode === 'static' || reduceMotion()) {
-      return Object.assign({}, STATIC_POSE, { ry: STATIC_POSE.ry + (st.flip ? Math.PI : 0) });
+      return Object.assign({}, STATIC_POSE, { ry: STATIC_POSE.ry + (st.flip ? Math.PI : 0) + spin });
     }
     let rx = 0.25 * Math.sin(t * 0.9);
     let ry = 0.35 * Math.sin(t * 0.6);
@@ -387,7 +408,7 @@ void main() {
       ry = st.ty + 0.08 * Math.sin(t * 0.6);
     }
     st.flipAngle = (st.flipAngle || 0) + ((st.flip ? Math.PI : 0) - (st.flipAngle || 0)) * 0.14;
-    ry += st.flipAngle;
+    ry += st.flipAngle + spin;
     return { rx, ry, t, lx: -0.45 + 0.25 * Math.sin(t * 0.5), ly: 0.55 };
   }
 
@@ -398,8 +419,10 @@ void main() {
       if (!canvas.isConnected) { live.delete(canvas); continue; }
       const st = canvas._coin;
       if (st.front && st.back) draw(canvas, st.spec, pose(canvas, now), st.front, st.back);
+      // Ruhende Album-Münzen verlassen die Animation wieder
+      if (canvas.dataset.mode === 'static' && settled(st)) live.delete(canvas);
     }
-    if (live.size && !reduceMotion()) raf = requestAnimationFrame(loop);
+    if (live.size && (!reduceMotion() || [...live].some((c) => !settled(c._coin)))) raf = requestAnimationFrame(loop);
   }
   function kick() { if (!raf && live.size) raf = requestAnimationFrame(loop); }
 
@@ -414,9 +437,51 @@ void main() {
       st.back = back;
       st.start = performance.now();
       canvas.parentNode && canvas.parentNode.classList.add('coin3d-on');
+      if (canvas.dataset.drag) enableDrag(canvas);
       if (canvas.dataset.mode === 'static') draw(canvas, spec, pose(canvas, performance.now()), front, back);
       else { live.add(canvas); kick(); }
     }).catch(() => canvas.remove()); // Platzhalter bleibt sichtbar
+  }
+
+  // Ziehen dreht die Münze um die senkrechte Achse, volle 360°.
+  // Senkrechtes Wischen bleibt Scrollen (touch-action: pan-y), ein Tippen
+  // ohne Ziehen bleibt ein normaler Klick.
+  function enableDrag(canvas) {
+    const host = canvas.parentNode;
+    const st = canvas._coin;
+    if (!host || host._drag) return;
+    host._drag = true;
+    host.classList.add('coin3d-drag');
+    let x0 = null, lastX = 0, lastT = 0, moved = false;
+    host.addEventListener('pointerdown', (e) => {
+      x0 = lastX = e.clientX; lastT = e.timeStamp; moved = false;
+      st.dragging = true; st.v = 0; st.snap = false;
+      live.add(canvas); kick();
+    });
+    host.addEventListener('pointermove', (e) => {
+      if (x0 == null) return;
+      if (!moved && Math.abs(e.clientX - x0) > 6) {
+        moved = true;
+        try { host.setPointerCapture(e.pointerId); } catch (err) { /* egal */ }
+      }
+      const k = (Math.PI * 2) / Math.max(120, host.clientWidth * 2.4);  // eine Umdrehung ≈ 2,4 Münzbreiten
+      const dx = e.clientX - lastX;
+      st.spin = (st.spin || 0) + dx * k;
+      st.v = (dx * k) / Math.max(1, e.timeStamp - lastT) * 16;
+      lastX = e.clientX; lastT = e.timeStamp;
+      kick();
+    });
+    const end = () => {
+      if (x0 == null) return;
+      x0 = null; st.dragging = false;
+      if (!st.v) st.snap = true;
+      kick();
+    };
+    host.addEventListener('pointerup', end);
+    host.addEventListener('pointercancel', end);
+    host.addEventListener('lostpointercapture', end);
+    // Nach dem Drehen kein Klick (sonst öffnet sich die Einzelansicht)
+    host.addEventListener('click', (e) => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } });
   }
 
   // Statische Münzen erst rendern, wenn sie ins Bild kommen
