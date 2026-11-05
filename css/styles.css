@@ -525,3 +525,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .coin.coin3d-on.rare-country { box-shadow: 0 0 22px 2px rgba(255, 197, 61, .55); }
 .coin.coin3d-drag { cursor: grab; touch-action: pan-y; }
 .coin.coin3d-drag:active { cursor: grabbing; }
+/* Münzwurf: bis die 3D-Münze bereit ist, nichts zeigen (sonst blitzt der Platzhalter auf) */
+.coin.coin-toss:not(.coin3d-on) { background: none; box-shadow: none; }
+.coin.coin-toss:not(.coin3d-on) > div { visibility: hidden; }
+.coin.coin-toss canvas.coin3d { will-change: transform; filter: drop-shadow(0 14px 18px rgba(0, 0, 0, .5)); }

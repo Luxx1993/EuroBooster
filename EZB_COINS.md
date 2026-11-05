@@ -18,7 +18,8 @@ Die Fotos werden nicht direkt gezeigt. `js/coin3d.js` rendert jede Münze im Cod
 - **Dicke und Rand**, geriffelt bei 10 Cent, 50 Cent und 2 €
 - **Relief** aus dem Foto der Nationalseite: Helligkeitsunterschiede werden zu Erhebungen, Licht und Spiegelungen wandern darüber
 - **Gemeinschaftsseite** im Code gezeichnet (Wert, „EURO“/„EURO CENT“, zwölf Sterne, Linien)
-- **Animation:** Einwurf mit Drehung im Pack, leichtes Wiegen, Neigung nach Finger oder Gerätesensor in der Einzelansicht, „Wenden“
+- **Münzwurf im Pack:** von unten hereingeworfen, mehrere Salti, Landung auf der Zahlseite, kurze Pause, dann Umdrehen auf die Bildseite. Weil die Zahlseite in allen Ländern gleich ist, verrät erst das Umdrehen die Herkunft. Normale Slots kurz (1,4 s), Hit-Slot lang (3,2 s)
+- **Drehen:** im Album und in der Einzelansicht per Ziehen 360°, mit Schwung und Einrasten; Neigung nach Finger oder Gerätesensor, „Wenden“
 
 Ohne WebGL erscheint eine gezeichnete Münze mit Flagge und Wert.
 

@@ -383,10 +383,62 @@ void main() {
   }
   const settled = (st) => !st.dragging && !st.v && !st.snap;
 
+  // Münzwurf beim Öffnen: von unten hereingeworfen, landet auf der Zahl
+  // (für alle Länder gleich), bleibt kurz liegen und dreht sich dann auf die
+  // Bildseite. Zeiten in Sekunden; „fast“ für die normalen Slots.
+  const TOSS = {
+    full: { fly: 1.25, bounce: 0.18, rest: 1.0, turn: 0.75, flips: 4 },
+    fast: { fly: 0.6, bounce: 0.1, rest: 0.3, turn: 0.4, flips: 2 },
+  };
+  function tossTiming(kind) {
+    const T = TOSS[kind] || TOSS.fast;
+    return { land: T.fly + T.bounce, turn: T.fly + T.bounce + T.rest, end: T.fly + T.bounce + T.rest + T.turn };
+  }
+  const ease = (k) => 1 - Math.pow(1 - Math.min(1, Math.max(0, k)), 3);
+
+  function tossPose(canvas, t) {
+    const T = TOSS[canvas.dataset.toss] || TOSS.fast;
+    const size = canvas.clientWidth || 200;
+    const below = Math.max(window.innerHeight * 0.75, size * 3);   // Start unterhalb des Bildschirms
+    let rx = Math.PI, ry = 0, rz = Math.PI, y = 0, sc = 1;
+    if (t < T.fly) {
+      // Flugbahn: von unten hoch über die Mitte, dann herab
+      const k = t / T.fly;
+      y = below * (1 - k) * (1 - k) - size * 1.1 * 4 * k * (1 - k);
+      sc = 1 + 0.3 * Math.sin(Math.PI * k);
+      // Salti um die waagrechte Achse, die zum Ende hin auslaufen
+      rx = Math.PI + (1 - ease(k)) * Math.PI * 2 * T.flips;
+    } else if (t < T.fly + T.bounce) {
+      const k = (t - T.fly) / T.bounce;
+      y = -size * 0.06 * Math.sin(Math.PI * k);
+      rx = Math.PI - 0.12 * Math.sin(Math.PI * k);
+    } else if (t < T.fly + T.bounce + T.rest) {
+      // liegt auf der Zahl; Rx(π)·Rz(π) entspricht Ry(π), also lesbar
+      rx = Math.PI;
+    } else {
+      // umdrehen zur Seite, mit leichtem Anheben
+      const k = Math.min(1, (t - T.fly - T.bounce - T.rest) / T.turn);
+      rx = -0.25 * Math.sin(Math.PI * k);
+      rz = 0;
+      ry = Math.PI * (1 - ease(k));
+      y = -size * 0.08 * Math.sin(Math.PI * k);
+      sc = 1 + 0.06 * Math.sin(Math.PI * k);
+      if (k >= 1) {
+        // danach sanftes Wiegen wie im Tausch
+        const w = t - T.fly - T.bounce - T.rest - T.turn;
+        rx = 0.18 * Math.sin(w * 0.9);
+        ry = 0.25 * Math.sin(w * 0.6);
+      }
+    }
+    canvas.style.transform = `translateY(${y.toFixed(1)}px) scale(${sc.toFixed(3)})`;
+    return { rx, ry, rz, t, lx: -0.45 + 0.25 * Math.sin(t * 0.7), ly: 0.55 };
+  }
+
   function pose(canvas, now) {
     const st = canvas._coin;
     const t = (now - st.start) / 1000;
     const mode = canvas.dataset.mode;
+    if (mode === 'toss' && !reduceMotion()) return tossPose(canvas, t);
     const spin = userSpin(st);
     if (mode === 'static' || reduceMotion()) {
       return Object.assign({}, STATIC_POSE, { ry: STATIC_POSE.ry + (st.flip ? Math.PI : 0) + spin });
@@ -440,7 +492,11 @@ void main() {
       if (canvas.dataset.drag) enableDrag(canvas);
       if (canvas.dataset.mode === 'static') draw(canvas, spec, pose(canvas, performance.now()), front, back);
       else { live.add(canvas); kick(); }
-    }).catch(() => canvas.remove()); // Platzhalter bleibt sichtbar
+    }).catch(() => {
+      // Platzhalter bleibt sichtbar
+      if (canvas.parentNode) canvas.parentNode.classList.remove('coin-toss');
+      canvas.remove();
+    });
   }
 
   // Ziehen dreht die Münze um die senkrechte Achse, volle 360°.
@@ -508,6 +564,11 @@ void main() {
 
   window.Coin3D = {
     supported: !!gl,
+    // Zeitpunkte des Münzwurfs in ms: gelandet (Zahl), Umdrehen beginnt, fertig
+    tossTiming(kind) {
+      const r = tossTiming(kind);
+      return { land: r.land * 1000, turn: r.turn * 1000, end: r.end * 1000 };
+    },
     // Ziel für Neigung (Bogenmaß) und Wenden setzen
     tilt(canvas, x, y) { if (canvas && canvas._coin) { canvas._coin.targetX = x; canvas._coin.targetY = y; kick(); } },
     flip(canvas) {

@@ -179,9 +179,10 @@
   // mode: static (Album, Ablage), spin (Reveal), wobble (Tausch), tilt (Einzelansicht)
   function coinHTML(it, opts = {}) {
     const src = window.Coin3D && window.Coin3D.supported ? coinImage(it) : null;
-    const cls = ['coin', coinClass(it.cents), it.commemorative ? 'gedenk' : '', it.rareCountry ? 'rare-country' : ''].join(' ');
+    const toss = src && opts.mode === 'toss';
+    const cls = ['coin', coinClass(it.cents), it.commemorative ? 'gedenk' : '', it.rareCountry ? 'rare-country' : '', toss ? 'coin-toss' : ''].join(' ');
     const label = coinLabel(it.cents) + ' · ' + it.countryName + (it.commemorative ? ' · Gedenkmünze ' + it.commemorative : '');
-    const canvas = src ? `<canvas class="coin3d" role="img" aria-label="${esc(label)}" data-src="${src}" data-cents="${it.cents}" data-mode="${opts.mode || 'static'}"${opts.drag ? ' data-drag="1"' : ''}></canvas>` : '';
+    const canvas = src ? `<canvas class="coin3d" role="img" aria-label="${esc(label)}" data-src="${src}" data-cents="${it.cents}" data-mode="${opts.mode || 'static'}"${toss ? ` data-toss="${opts.toss || 'fast'}"` : ''}${opts.drag ? ' data-drag="1"' : ''}></canvas>` : '';
     return `<div class="${cls}" title="${esc(label)}">${canvas}
       <div><div class="c-flag">${flag(it.country)}</div><div class="c-val">${coinLabel(it.cents)}</div><div class="c-cc">${it.commemorative || it.country}</div></div>
     </div>`;
@@ -653,10 +654,7 @@
     const steps = $('#steps');
     const addStep = (html) => { steps.insertAdjacentHTML('beforeend', `<div class="step">${html}</div>`); sfx.drum(); haptic(1); };
     if (coin) {
-      addStep(`<div class="big">${flag(hit.country)}</div><div class="lbl">${esc(hit.countryName)}</div>`);
-      if (!(await wait(1100, !lock)) || !ok()) return;
-      addStep(`<div class="code">${hit.commemorative ? 'GEDENK ' + hit.commemorative : 'UMLAUF'}</div><div class="lbl">Prägung</div>`);
-      if (!(await wait(1100, !lock)) || !ok()) return;
+      // Münzen: kein Stufen-Reveal – das Land soll erst nach dem Wurf feststehen
     } else {
       addStep(`<div class="big">${flag(hit.country)}</div><div class="lbl">Druckland</div>`);
       if (!(await wait(1100, !lock)) || !ok()) return;
@@ -722,11 +720,28 @@
     const title = coin ? `${coinLabel(it.cents)} · ${esc(it.countryName)}` : `${it.denom} € · ${esc(D.MOTIFS[it.theme][it.denom].front)}`;
     const sub = subtitle || (coin ? (it.commemorative ? 'Gedenkmünze ' + it.commemorative : 'Umlaufmünze') : `Entwurf ${it.design} · ${r.name}${it.edition ? ' · ' + editionName(it.edition) : ''}`);
     center.innerHTML = `<div class="reveal ${coin ? 'coin-reveal' : ''}">
-        <div class="flipper ${coin ? '' : 'face-down'}">${glow}<div class="face">${itemHTML(it, { extra: it.edition === 'tinte' ? 'print-in' : '', mode: 'spin' })}</div>${coin ? '' : '<div class="card-back">€</div>'}</div>
+        <div class="flipper ${coin ? '' : 'face-down'}">${glow}<div class="face">${itemHTML(it, { extra: it.edition === 'tinte' ? 'print-in' : '', mode: coin ? 'toss' : 'spin', toss: isHit ? 'full' : 'fast' })}</div>${coin ? '' : '<div class="card-back">€</div>'}</div>
         <div class="reveal-label" style="opacity:0;transition:opacity .3s"><div class="r-title">${title}</div><div class="r-sub">${esc(sub)}</div><div>${badgesFor(it)}</div></div>
       </div>`;
     const fl = center.querySelector('.flipper');
     const label = center.querySelector('.reveal-label');
+    // Münzen: Münzwurf. Landung auf der Zahl, dann Umdrehen auf die Bildseite;
+    // erst danach verraten Beschriftung und Badges das Land.
+    if (coin && center.querySelector('canvas.coin3d') && !S.settings.reduceMotion) {
+      const T = window.Coin3D.tossTiming(isHit ? 'full' : 'fast');
+      const at = (ms, fn) => setTimeout(() => { if (myRun === run && center.contains(fl)) fn(); }, ms);
+      at(T.land - 60, () => { sfx.tick(); tone(isHit ? 520 : 760, 0.09, 'triangle', 0.08); haptic(isHit ? 2 : 1); });
+      at(T.turn, () => sfx.flip());
+      at(T.end, () => {
+        label.style.opacity = 1;
+        haptic(it.rareCountry || it.commemorative ? 3 : 1);
+        if (it.rareCountry || it.commemorative) sfx.coin();
+      });
+      if (!(await wait(T.end + 120))) return;
+      label.style.opacity = 1;
+      if (holdMs) await wait(holdMs);
+      return;
+    }
     // Verdeckt mit Glühen, dann umdrehen
     await new Promise((res) => setTimeout(res, isHit ? 350 : S.settings.reduceMotion ? 50 : 260));
     if (myRun !== run) return;
