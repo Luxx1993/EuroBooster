@@ -649,10 +649,8 @@
       if (!(await wait(1100, !lock)) || !ok()) return;
       addStep(`<div class="code">${esc(hit.printer)}</div><div class="lbl">Druckerei ${esc(hit.printerName)}</div>`);
       if (!(await wait(1100, !lock)) || !ok()) return;
-      addStep(`<div class="code">${esc(hit.design)}</div><div class="lbl">Entwurf · ${esc(designById(hit.design).designer)}</div>`);
-      if (!(await wait(1100, !lock)) || !ok()) return;
-      addStep(`<div class="swatch" style="background:${D.DENOM_COLORS[hit.denom]};color:${D.DENOM_COLORS[hit.denom]}"></div><div class="lbl">Stückelung</div>`);
-      if (!(await wait(1200, !lock)) || !ok()) return;
+      addStep(`<div class="code">${esc(hit.design)}</div><div class="lbl">Entwurf</div><div class="who">${esc(designById(hit.design).designer)}</div>`);
+      if (!(await wait(1300, !lock)) || !ok()) return;
     }
 
     // Hit
