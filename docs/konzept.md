@@ -8,6 +8,14 @@ Ein Booster kostet 50 € und enthält 5 zufällige, echte Euro-Banknoten der ne
 
 Die neue Serie ist dafür ideal, weil sie erstmals echte Motive zeigt – Persönlichkeiten, Orte, Vögel und Flüsse statt abstrakter Fenster und Brücken. Das gibt jedem Schein einen Charakter wie eine Sammelkarte.
 
+## Entscheidungen (Stand 5. November 2026)
+
+- **Variante:** Umgesetzt wird die digitale Variante C. Der Browser-Prototyp läuft unter [luxx1993.github.io/EuroBooster](https://luxx1993.github.io/EuroBooster/), der Code liegt im Repository [Luxx1993/EuroBooster](https://github.com/Luxx1993/EuroBooster).
+- **Alle zehn Entwürfe sind gültiges Geld:** Digital gibt es keine Druckkosten, also muss kein Siegerdesign gewählt werden. Statt 6 echter Scheine und 54 Prototypen gibt es 60 gleichberechtigte Scheine. Gedruckt wird weiterhin nur der Entwurf, den der EZB-Rat auswählt. Die Prototyp-Edition und die Prototyp-Bonuskarte entfallen.
+- **Hochformat:** Alle Scheine werden hochkant dargestellt, wie die Hochformat-Entwürfe D, G, I und J. Querformat-Entwürfe werden um 90° gedreht.
+- **Echte Bilder:** Die Karten zeigen die Gestaltungsvorschläge der EZB, im Rahmen redaktioneller Berichterstattung und mit Bildnachweis.
+- **Tausch:** 1:1 zum gleichen Nennwert, bevorzugt gegen einen fehlenden Entwurf. Der eigene Schein fliegt über die obere Bildschirmkante hinaus, der neue kommt von oben herein.
+
 ## Satire-Edition: Das offizielle EZB-Produkt
 
 Da nur Staat und Zentralbank Geld ausgeben dürfen, kann es den Booster eigentlich nur als offizielles Produkt der EZB geben. Also tun wir so, als wäre es eins.
@@ -49,7 +57,7 @@ Mit dem geplanten digitalen Euro wird das Konzept endgültig „offiziell denkba
 | Battle Pass | „Saison 1: Fiskalunion“ – Level steigen durch Einkäufe im Euroraum |
 | Seltenheiten | Digitale Scheine mit Seriennummer, Holo-Animation beim Öffnen |
 | Tauschbörse | Scheine mit anderen tauschen – 1:1, weil es ja Geld ist |
-| Sammelbuch | Alle 60 Entwurfsmotive freischalten, inklusive nie gedruckter Prototypen |
+| Sammelbuch | Alle 60 Scheine freischalten: 10 Entwürfe × 6 Stückelungen, alle gültiges digitales Geld |
 | Haltelimit | Die geplante Obergrenze für digitale Euro wird zur „Kartenbox ist voll“-Meldung |
 
 ### Zwei Booster-Typen in der App
@@ -59,12 +67,11 @@ Echte Booster gibt es nur mit Scheinen. Digital kommt ein günstiger Münz-Boost
 |  | Schein-Booster | Münz-Booster |
 | --- | --- | --- |
 | Preis | 50 € | 3 € |
-| Inhalt | 5 Scheine (echt oder digital) | 10 Münzen (nur digital) |
+| Inhalt | 5 Scheine (gedruckt: nur das Siegerdesign; digital: alle 10 Entwürfe) | 10 Münzen (nur digital) |
 | Slots 1–8 | – | 1 Cent (30 %), 2 Cent (25 %), 5 Cent (20 %), 10 Cent (15 %), 20 Cent (10 %) |
 | Slot 9 | – | 50 Cent (50 %), 1 € (35 %), 2 € (15 %) |
 | Hit-Slot | Wie im Abschnitt Booster-Aufbau | 1 € oder 2 € aus seltenem Land oder als Gedenkmünze |
 | Nennwert im Schnitt | 45,75 € | etwa 2,62 € |
-| Prototyp-Bonus | 6. Karte: ein nie gedruckter Entwurf | – |
 
 Beim Münz-Booster liegt der Nennwert im Schnitt bei rund 87 % des Preises; der eigentliche Wert steckt in der Herkunft der Münzen.
 
@@ -74,24 +81,23 @@ Die Pointe der Ausbaustufe: Ausgerechnet die Institution, die für Preisstabilit
 
 Das Design steht noch nicht fest: Die EZB hat am 23. Juli 2026 zehn Entwürfe vorgestellt, die Umfrage lief bis 21. September, die Entscheidung des EZB-Rats wird für Dezember 2026 erwartet ([EZB](https://www.ecb.europa.eu/press/pr/date/2026/html/ecb.pr260723%7Ec2d43f9170.de.html), [teltarif](https://www.teltarif.de/arch/2026/kw31/s105054.html)). In Umlauf kommen die Scheine voraussichtlich ab Ende 2028 ([GIGA](https://www.giga.de/tech/neue-euro-scheine-brechen-mit-24-jahre-alter-tradition--01KY9PGXWFQ42N5V6E3BBGXP38)).
 
-Genau das ist ein Spiel-Feature: Es gibt zwei Themen mit je fünf Entwurfsserien zu sechs Stückelungen (5 bis 200 €) – zusammen 60 Motive. Daraus werden zwei Editionen:
+Genau das ist ein Spiel-Feature: Es gibt zwei Themen mit je fünf Entwurfsserien zu sechs Stückelungen (5 bis 200 €) – zusammen 60 Motive. Für das gedruckte Geld wählt der EZB-Rat einen Entwurf aus. Digital gibt es keine Druckkosten, dort müssen die anderen neun nicht verschwinden: **Alle zehn Entwürfe sind gültiges digitales Geld.** Daraus werden zwei Editionen:
 
-| Edition | Thema | Beispielmotive | Rolle im Spiel |
+| Edition | Thema | Entwürfe | Beispielmotive |
 | --- | --- | --- | --- |
-| Kultur-Edition | Europäische Kultur | Persönlichkeiten wie Beethoven oder Marie Curie, Marktplätze, Theater | Grundset, sobald das Siegerdesign feststeht |
-| Natur-Edition | Flüsse und Vögel | Vogelmotive, Flusslandschaften | Zweites Set oder Sonderedition |
-| Prototyp-Edition | Alle 10 Entwürfe | Die 54 Motive, die nie gedruckt werden | Nur als Sammelkarten, nicht als Geld |
+| Kultur-Edition | Europäische Kultur | A, C, E, F, G | Persönlichkeiten wie Beethoven oder Marie Curie, Bibliotheken, Theater |
+| Natur-Edition | Flüsse und Vögel | B, D, H, I, J | Vogelmotive, Flusslandschaften, EU-Institutionen |
 
-Die Prototyp-Edition ist der heimliche Star: Scheine, die es nie geben wird, sind für Sammler oft spannender als die echten.
+Das macht die digitale Variante reicher als das Bargeld: Wer einen 20er von Entwurf G besitzt, hält einen Schein, den es gedruckt vielleicht nie geben wird – und kann trotzdem damit bezahlen.
 
 ## Das Sammel-Universum
 
-Alle zehn vorgestellten Entwürfe werden zu Sammelobjekten – auch die neun, die nie gedruckt werden. Dazu kommen die Euromünzen mit ihren nationalen Rückseiten. So wächst der Katalog von 6 echten Scheinen auf mehrere hundert Sammelstücke.
+Alle zehn vorgestellten Entwürfe werden zu Sammelobjekten und zu gültigem digitalen Geld – auch die neun, die nie gedruckt werden. Dazu kommen die Euromünzen mit ihren nationalen Rückseiten. So wächst der Katalog von 6 gedruckten Scheinen auf mehrere hundert Sammelstücke.
 
 | Kategorie | Anzahl | Woher | Wo erhältlich |
 | --- | --- | --- | --- |
-| Siegerdesign (echte Scheine) | 6 Stückelungen | Der Entwurf, den die EZB auswählt | Echte Booster und digital |
-| Prototyp-Scheine | 54 Motive | Die neun anderen Entwürfe à 6 Stückelungen | Nur digital, als Sammelkarten |
+| Digitale Scheine | 60 | Alle 10 Entwürfe à 6 Stückelungen, alle gültiges Geld | Digitale Schein-Booster |
+| Gedruckte Scheine | 6 Stückelungen | Der Entwurf, den der EZB-Rat auswählt | Echtgeld-Booster (Variante A) |
 | Umlaufmünzen | rund 200 | 8 Werte (1 Cent bis 2 €) × 21 Euro-Länder plus Monaco, San Marino, Vatikan und Andorra | Nur digitale Münz-Booster |
 | 2-€-Gedenkmünzen | mehrere hundert | Jedes Land darf zusätzlich Gedenkmotive ausgeben | Nur digitale Münz-Booster, als Hit-Slot |
 
@@ -99,7 +105,7 @@ Wie bei den Münzen entsteht der Reiz durch Herkunft: Eine deutsche 1-€-Münze
 
 ## Katalog der zehn Entwürfe
 
-Alle zehn Entwürfe zeigen dieselben sechs Motive je Thema – nur jeweils anders gezeichnet. Für das Sammelspiel heißt das: Jedes Motiv gibt es in fünf Stilen, und wer alle fünf Varianten eines Motivs hat, besitzt ein komplettes „Motiv-Set“. Die Bilder selbst liegen in der [EZB-Galerie der Entwürfe](https://www.ecb.europa.eu/euro/banknotes/future_banknotes/html/design-proposals.de.html); im Mockup stehen Platzhalter mit Motivname und Stückelungsfarbe.
+Alle zehn Entwürfe zeigen dieselben sechs Motive je Thema – nur jeweils anders gezeichnet. Für das Sammelspiel heißt das: Jedes Motiv gibt es in fünf Stilen, und wer alle fünf Varianten eines Motivs hat, besitzt ein komplettes „Motiv-Set“. Die Bilder selbst liegen in der [EZB-Galerie der Entwürfe](https://www.ecb.europa.eu/euro/banknotes/future_banknotes/html/design-proposals.de.html); die App zeigt sie auf den Karten, im Hochformat zugeschnitten und mit Bildnachweis. Lädt ein Bild nicht, erscheint ein Platzhalter mit Motivname und Stückelungsfarbe.
 
 **Motive je Stückelung**
 
@@ -129,7 +135,7 @@ Bei den Vögeln wandert die Reise mit steigendem Wert von der Quelle zum Meer �
 | I | Isabelle Daëron | Flüsse und Vögel | Hochformat; ein Vogel vorne, ein Schwarm hinten, dazu seine Beute; Folie zeigt Flugmaschinen vom Propeller bis zum Satelliten | [EZB-Galerie](https://www.ecb.europa.eu/euro/banknotes/future_banknotes/html/design-proposals.de.html#proposalI) |
 | J | Ville Tietäväinen | Flüsse und Vögel | Hochformat; Bildgeschichte des Flusses von der Quelle zum Meer; EU-Gebäude verschmelzen mit dem Vogelflügel | [EZB-Galerie](https://www.ecb.europa.eu/euro/banknotes/future_banknotes/html/design-proposals.de.html#proposalJ) |
 
-**Im Spiel:** 10 Entwürfe × 6 Scheine = 60 Karten. Die Seltenheit innerhalb der Prototypen kann sich nach dem Ergebnis der EZB-Umfrage richten – je weniger Stimmen ein Entwurf bekam, desto seltener seine Karten.
+**Im Spiel:** 10 Entwürfe × 6 Stückelungen = 60 Scheine, alle gültiges Geld. Jeder Schein im Pack bekommt einen zufälligen Entwurf; vorerst kommen alle gleich oft vor. Später kann sich die Häufigkeit nach dem Ergebnis der EZB-Umfrage richten – je weniger Stimmen ein Entwurf bekam, desto seltener seine Scheine.
 
 Quellen: [EZB – Gestaltungsvorschläge](https://www.ecb.europa.eu/euro/banknotes/future_banknotes/html/design-proposals.de.html), [EZB – Bericht der Jury](https://www.ecb.europa.eu/press/pubbydate/2026/html/ecb.desreportbanknotes202607.de.html), [konto.org – Motive aller Entwürfe](https://www.konto.org/ratgeber/allgemein/neue-euro-scheine/)
 
@@ -167,8 +173,8 @@ Damit sich auch ein 30-€-Pack lohnt, braucht jeder Schein einen Sammelwert üb
 - **Druckerei-Code:** Jeder Euroschein trägt einen Code der Druckerei – Scheine aus seltenen Druckereien werden zu Länder-Varianten.
 - **Erstauflage:** Scheine aus den ersten Monaten nach Ausgabe als „1st Edition“.
 - **Unterschrift:** Die Unterschrift des EZB-Präsidenten wechselt mit der Amtszeit – frühe Scheine werden zur Ära-Variante.
-- **Set-Bonus:** Wer alle sechs Stückelungen einer Edition hat, schaltet ein Sammelalbum oder einen Bonus-Pack frei.
-- **Prototyp-Inserts:** Als zusätzliche 6. Karte eine Sammelkarte mit einem der nie gedruckten Entwürfe (kein Geld, klar als Karte gekennzeichnet).
+- **Set-Bonus:** Wer alle sechs Stückelungen eines Entwurfs hat, bekommt einen Bonus-Pack.
+- **Entwurf:** Jeder Schein trägt einen der zehn Entwürfe – ein 50er von Entwurf J ist ein anderes Sammelstück als einer von Entwurf A.
 
 ## Unboxing-Erlebnis
 
@@ -189,10 +195,12 @@ Dazu kommt: Abbildungen von Euroscheinen (etwa auf Karten oder Verpackung) unter
 | Variante | Inhalt | Preis | Vorteil | Haken |
 | --- | --- | --- | --- | --- |
 | A – Echtgeld-Booster | 5 echte Scheine | 50 € | Maximaler Nervenkitzel, Pointe des Konzepts | Glücksspiellizenz, Geldtransport, Sicherheit |
-| B – Sammelkarten-Booster | 5 Karten mit Banknoten-Motiven, Wert nur Sammlerwert | 3–5 € | Rechtlich wie normale Sammelkarten, Prototyp-Edition möglich | EZB-Genehmigung für Motive, Reproduktionsregeln |
+| B – Sammelkarten-Booster | 5 Karten mit Banknoten-Motiven, Wert nur Sammlerwert | 3–5 € | Rechtlich wie normale Sammelkarten, alle zehn Entwürfe möglich | EZB-Genehmigung für Motive, Reproduktionsregeln |
 | C – Digital | Virtuelle Scheine in einer App | kostenlos bis wenige € | Schnell als Prototyp baubar | Lootbox-Debatte bei Echtgeldkäufen |
 
-Für ein privates Projekt ist Variante C der schnellste Weg, die Idee spielbar zu machen – Variante A bleibt der Witz, über den man spricht.
+Für ein privates Projekt ist Variante C der schnellste Weg, die Idee spielbar zu machen – Variante A bleibt der Witz, über den man spricht. **Entschieden:** Der Prototyp setzt Variante C um.
+
+Der Prototyp zeigt die Entwürfe der EZB im Rahmen redaktioneller Berichterstattung, mit Bildnachweis in der App und im Repository. Öffentlich abrufbar sind nur verkleinerte Kartenbilder, nicht die Originale. Gespielt wird mit Spielgeld, es gibt keine Echtgeldkäufe.
 
 # App-Spezifikation
 
@@ -204,7 +212,7 @@ Die besten Pack-Openings verraten die Seltenheit schon vor dem Aufdecken – dur
 | --- | --- | --- |
 | [Hearthstone](https://hearthstone.wiki.gg/wiki/Card_Pack) | 5 Karten liegen verdeckt, jede wird einzeln umgedreht; Glühen zeigt die Seltenheit vorab: keins, blau, lila, orange. Neue Karten tragen „NEU!“ | Verdeckte Scheine mit Seltenheits-Glühen vor dem Umdrehen, „NEU!“-Label |
 | [Pokémon TCG Pocket](https://www.wargamer.com/pokemon-tcg-pocket/rarity) | Feste Slots: Karten 1–3 immer gewöhnlich, Slot 5 mit den besten Chancen; höchste Stufe sind animierte „Immersive“-Karten mit eigener Musik; seltener „God Pack“ mit nur Hits | Slot-Aufbau, animierter Regenbogen-Schein, „Zentralbank-Pack“ als God Pack |
-| [EA FC Ultimate Team](https://www.dexerto.com/wikis/ea-fc-26-guides-walkthrough-tips/pack-animations) | Walkout: Tunnel, dann nacheinander Flaggen für Position, Liga, Nation, erst danach die Karte; Linienfarben verraten vorab, ob ein Top-Spieler kommt | Stufenweiser Reveal des Hit-Slots: erst Land, dann Druckerei, dann Wert |
+| [EA FC Ultimate Team](https://www.dexerto.com/wikis/ea-fc-26-guides-walkthrough-tips/pack-animations) | Walkout: Tunnel, dann nacheinander Flaggen für Position, Liga, Nation, erst danach die Karte; Linienfarben verraten vorab, ob ein Top-Spieler kommt | Stufenweiser Reveal des Hit-Slots: erst Land, dann Druckerei, dann Entwurf |
 | [Marvel Snap](https://snap.fan/guides/infinity-splits-and-frame-breaks-guide/) | Varianten derselben Karte: Finishes wie Foil, Prism, Ink, Gold und Rand-Effekte wie Glimmer, Stardust, Krackle in acht Farben | Special Editions als Finishes auf demselben Schein |
 | [pokemon-cards-css](https://github.com/simeydotme/pokemon-cards-css) | Holo-Effekt im Browser: Lichtreflex folgt Maus oder Neigung, Klick vergrößert die Karte | Holo-Darstellung im Sammelalbum, technisch als Web-Vorlage |
 | [Apple Wallet](https://ixd.prattsi.org/2026/09/design-critique-apple-wallet-ios/) | Karten liegen als Stapel wie im Portemonnaie, die oberste ist aktiv; Bewegung wie Durchblättern, Haptik bestätigt Zahlungen | Wallet-Startscreen als Scheinstapel, Haptik bei jedem Reveal – stärker als bei Apple, die Kritik nennt sie zu schwach |
@@ -233,6 +241,8 @@ Der Look ist ein irisierender Digital-Euro: weiche Verläufe von Blau über Mint
 
 Die Farbwerte sind aus dem Bild geschätzt; für ein Mockup lohnt es, sie mit einer Pipette am Original nachzuziehen.
 
+**Format:** Alle Scheine erscheinen im Hochformat (1:1,9), wie die Hochformat-Entwürfe D, G, I und J. Querformat-Entwürfe werden um 90° gegen den Uhrzeigersinn gedreht, der Text läuft dann wie auf einem Buchrücken von unten nach oben.
+
 **Seltenheits-Glühen** richtet sich nach dem Wert, wie im Unboxing: 5–10 € ohne, 20 € Blau, 50 € Lila, 100 € Gold, 200 € Regenbogen. Special Editions bekommen zusätzlich ihr eigenes Finish.
 
 **Schrift**
@@ -254,11 +264,10 @@ Ein Opening dauert rund 20–40 Sekunden und baut die Spannung bis zum Hit-Slot 
 3. **Vorahnung:** Aus dem offenen Pack dringt Licht in der Farbe des besten Scheins (Hearthstone-Prinzip). Kein Licht = kein Hit.
 4. **Gewöhnliche Scheine:** Slots 1–4 fliegen einzeln heraus, drehen sich auf und zeigen kurz Wert, Motiv, „NEU!“ – je etwa 1 Sekunde.
 5. **Trennkarte:** Vor dem Hit-Slot erscheint die farbige Trennkarte; der Bildschirm wird dunkler, Musik wird leiser.
-6. **Stufen-Reveal (EA-FC-Prinzip):** Erst die Flagge des Ausgabelands, dann der Druckerei-Code, dann die Farbe der Stückelung – jede Stufe mit Trommelwirbel.
+6. **Stufen-Reveal (EA-FC-Prinzip):** Erst die Flagge des Drucklands, dann der Druckerei-Code, dann der Entwurf mit Gestalter – jede Stufe mit Trommelwirbel. Der Wert zeigt sich erst beim Umdrehen.
 7. **Hit:** Schein dreht sich auf, Lichtstrahlen, Partikel in Seltenheitsfarbe; bei 200 € Konfetti in Euro-Symbolen und Münzregen.
 8. **Seriennummer-Check:** Die Nummer tippt sich Ziffer für Ziffer ein; bei Schnapszahl oder Palindrom ein zweiter Bonus-Effekt.
-9. **Prototyp-Bonus:** Die 6. Karte gleitet als Nachschlag ins Bild, mit Hinweis „Diesen Schein gibt es nie wirklich“.
-10. **Übersicht:** Alle Scheine fächern sich auf (nächster Abschnitt).
+9. **Übersicht:** Alle Scheine fächern sich auf (nächster Abschnitt).
 
 **Effekt-Baukasten:** Lichtglühen hinter dem Schein, Partikel (Glimmer, Sterne), Lichtstrahlen, Kamera-Wackler beim Hit, Zähler für den Packwert, Haptik je Reveal in drei Stärken. Für Barrierefreiheit: Option „Bewegung reduzieren“ ersetzt Flug und Wackeln durch Überblenden.
 
@@ -270,15 +279,14 @@ Nach dem Opening zeigt eine Übersicht alle neuen Scheine auf einen Blick; im Sa
 
 - Alle Scheine fächern sich nebeneinander auf, sortiert nach Wert, der Hit in der Mitte und größer.
 - Oben der Packwert als Zähler, der hochläuft, mit Vergleich zum Preis: „45 € von 50 € – Bank gewinnt“ oder „120 € – Du schlägst die EZB“.
-- Badges je Schein: „NEU!“, „Doppelt“, „Seltene Nummer“, „Prototyp“.
+- Badges je Schein: „NEU!“, „Doppelt“, „Seltene Nummer“, Edition.
 - Buttons: „Ins Album“, „Noch ein Pack“, „Teilen“ (Bild der aufgefächerten Scheine).
 
 **Sammelalbum**
 
 | Bereich | Inhalt | Darstellung |
 | --- | --- | --- |
-| Echte Serie | 6 Stückelungen des Siegerdesigns | Seiten wie ein Banknotenalbum mit Klarsichthüllen |
-| Prototypen | 54 Motive der neun anderen Entwürfe, je Entwurf eine Seite | Leere Plätze als Silhouette mit Wasserzeichen |
+| Scheine | 60: 10 Entwürfe × 6 Stückelungen, je Entwurf eine Seite | Seiten wie ein Banknotenalbum mit Klarsichthüllen; leere Plätze mit Wert und Motivname |
 | Münzen | Je Land eine Seite mit 8 Werten | Münzen in runden Mulden wie in einem Münzalbum |
 | Gedenkmünzen | Nach Jahr und Land | Zeitleiste zum Wischen |
 | Special Editions | Gold, Glitzer, Alternativmotive | Eigene „Tresor“-Seite mit Samt-Hintergrund |
@@ -288,7 +296,7 @@ Nach dem Opening zeigt eine Übersicht alle neuen Scheine auf einen Blick; im Sa
 - Vollbild mit Holo-Effekt, der der Handy-Neigung folgt; Wenden per Wischen zeigt die Rückseite.
 - Zoom bis auf Mikroschrift und Guilloche.
 - Steckbrief: Motiv, Entwurf und Designer, Seriennummer, Druckerei, Edition, Anzahl Doppelte, Fundzeitpunkt.
-- Fortschritt je Seite als Balken, z. B. „Prototypen 23/54“; Set-Bonus erscheint, sobald eine Seite voll ist.
+- Fortschritt als Balken, z. B. „Scheine 23/60“; Set-Bonus erscheint, sobald die Seite eines Entwurfs voll ist.
 
 ## Special Editions
 
@@ -316,9 +324,11 @@ Die App hat fünf Tabs in einer unteren Leiste; das Pack-Opening läuft als Voll
 | Shop | Booster-Auswahl | Schein-Booster (50 €), Münz-Booster (3 €), zeitlich begrenzte Editionen, offene Quoten pro Slot |
 | Öffnen | Pack-Opening (Vollbild) | Ablauf wie im Abschnitt Pack-Opening, danach die Übersicht |
 | Album | Sammelalbum | Seiten nach Bereich, Fortschritt, Einzelansicht mit Holo-Effekt |
-| Tausch | Tauschbörse | Doppelte anbieten, Gesuche, 1:1-Tausch, Freundesliste |
+| Tausch | Tauschbörse | Doppelte anbieten, Gesuche, 1:1-Tausch zum gleichen Nennwert, Freundesliste |
 
 **Weitere Screens:** Profil mit Statistik (Packs geöffnet, bester Pull, „Bank gewinnt“-Quote), Einstellungen (Haptik, Ton, Bewegung reduzieren, Ausgabelimit), Battle Pass „Saison 1: Fiskalunion“.
+
+**Tausch-Animation:** Der eigene Schein holt kurz Schwung und fliegt über die obere Bildschirmkante hinaus, der neue kommt von oben herein, federt aus und leuchtet auf. Abgegeben wird immer das unauffälligste Exemplar; Special Editions und seltene Nummern bleiben. Im Prototyp tauschen simulierte Sammler, echte Nutzer brauchen einen Server.
 
 **Ein Ablauf als Beispiel:** Wallet → Shop → Schein-Booster kaufen → Pack-Opening → Übersicht → „Ins Album“ → Album öffnet die Seite mit dem neuen Schein und markiert ihn.
 
@@ -328,23 +338,27 @@ Sechs Objekte reichen für einen ersten Prototyp: der Katalog beschreibt, was es
 
 | Objekt | Felder | Beispiel |
 | --- | --- | --- |
-| Motiv (Katalog) | id, typ (Schein/Münze), entwurf, thema, stückelung, land, motivname, bild, istEcht | Prototyp „Kultur 3“, 20 €, Marie Curie, istEcht = nein |
+| Motiv (Katalog) | id, typ (Schein/Münze), entwurf, thema, stückelung, land, motivname, bild | Entwurf C, 20 €, Marie Curie, Bild cards/C/20_front.jpg |
 | Edition | id, name, finish, chance, zeitraum | Gold, 0,5 %, dauerhaft |
 | Booster-Typ | id, name, preis, slots (je Slot eine Liste aus Motiv-Gruppe und Wahrscheinlichkeit) | Schein-Booster, 50 €, 5 Slots |
 | Exemplar | id, motivId, editionId, seriennummer, druckerei, besitzerId, gefundenAm, boosterId | 20 €, Gold, X123454321X |
 | Opening | id, nutzerId, boosterTypId, zeitpunkt, exemplarIds, packwert | Packwert 45 € |
 | Nutzer | id, name, guthaben, statistik, tauschliste | Lukas, 120 € |
 
-**Zufall:** Jedes Opening würfelt zuerst jeden Slot nach den Quoten des Booster-Typs, dann die Edition, dann eine Seriennummer. Seltene Nummern (Schnapszahl, Palindrom) werden beim Erzeugen erkannt und als Badge gespeichert.
+**Zufall:** Jedes Opening würfelt zuerst jeden Slot nach den Quoten des Booster-Typs, dann den Entwurf, dann die Edition, dann eine Seriennummer. Seltene Nummern (Schnapszahl, Palindrom) werden beim Erzeugen erkannt und als Badge gespeichert.
 
 **Technik für einen Web-Prototyp:** Eine Single-Page-App mit den Daten als JSON, Animationen mit CSS und einer Animationsbibliothek, Holo-Effekt nach dem Vorbild von pokemon-cards-css, Neigung über die Geräte-Bewegungssensoren im Browser.
 
 ## Nächste Schritte
 
-- [ ] Siegerdesign der EZB abwarten (Entscheidung erwartet Dezember 2026)
-- [ ] Variante wählen: Echtgeld, Sammelkarten oder digital
+- [x] Variante wählen: digital (Variante C)
+- [x] Browser-Prototyp: Pack-Opening-Simulator mit den Quoten oben – [luxx1993.github.io/EuroBooster](https://luxx1993.github.io/EuroBooster/)
+- [x] Echte Entwürfe der EZB auf den Karten, alle zehn als gültiges Geld
 - [ ] Quoten feinjustieren: Wie viel Frust (Median 40 €) ist noch spaßig?
-- [ ] Browser-Prototyp: Pack-Opening-Simulator mit den Quoten oben
+- [ ] Entscheidung des EZB-Rats (erwartet Dezember 2026) nachtragen – betrifft nur die gedruckte Serie, digital bleiben alle zehn gültig
+- [ ] Häufigkeit der Entwürfe nach dem Ergebnis der EZB-Umfrage gewichten
+- [ ] Battle Pass „Saison 1: Fiskalunion“
+- [ ] Echter Tausch zwischen Nutzern (braucht Server und Anmeldung)
 
 ## Quellen
 
