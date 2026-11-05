@@ -20,7 +20,7 @@ Die Fotos werden nicht direkt gezeigt. `js/coin3d.js` rendert jede Münze im Cod
 - **Gemeinschaftsseite** im Code gezeichnet (Wert, „EURO“/„EURO CENT“, zwölf Sterne, Linien)
 - **Münzwurf im Pack:** von unten hereingeworfen, mehrere Salti, Landung auf der Zahlseite, kurze Pause, dann Umdrehen auf die Bildseite. Weil die Zahlseite in allen Ländern gleich ist, verrät erst das Umdrehen die Herkunft. Normale Slots kurz (1,4 s), Hit-Slot lang (3,2 s)
 - **Album:** gerade und unbewegt, Bildseite nach oben
-- **Einzelansicht:** per Ziehen 360° drehbar, mit Schwung und Einrasten auf der näheren Seite; Neigung nach Finger oder Gerätesensor, „Wenden“
+- **Einzelansicht:** gerade, ohne Mitkippen; per Ziehen 360° drehbar, mit Schwung und Einrasten auf der näheren Seite; „Wenden“ dreht sichtbar um
 
 Ohne WebGL erscheint eine gezeichnete Münze mit Flagge und Wert.
 

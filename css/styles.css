@@ -421,10 +421,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .modal-card h2 { font-family: var(--font-head); margin: 0 0 10px; }
 .detail-stage { perspective: 900px; padding: 14px 4px 18px; touch-action: pan-y; }
 .tilt { transform-style: preserve-3d; transition: transform .12s ease-out; font-size: 14px; position: relative; width: min(56%, 220px); margin: 0 auto; }
-.tilt .glare { position: absolute; inset: 0; border-radius: 12px; z-index: 5; pointer-events: none; mix-blend-mode: overlay;
-  background: radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgba(255,255,255,.65), transparent 55%); }
 .tilt.coin-tilt { width: 60%; margin: 0 auto; font-size: 28px; }
-.tilt.coin-tilt .glare { border-radius: 50%; }
 .facts { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; font-size: 14px; margin: 6px 0 14px; }
 .facts dt { color: var(--muted); }
 .facts dd { margin: 0; }

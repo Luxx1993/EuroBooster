@@ -176,7 +176,7 @@
     if (it.commemorative) return null;
     return `${D.COIN_IMAGES}/${it.country}/${it.cents}.webp`;
   }
-  // mode: static (Album, Ablage), spin (Reveal), wobble (Tausch), tilt (Einzelansicht)
+  // mode: flat (Album, Einzelansicht), static (Ablage, Übersicht), toss (Münzwurf), wobble (Tausch)
   function coinHTML(it, opts = {}) {
     const src = window.Coin3D && window.Coin3D.supported ? coinImage(it) : null;
     const toss = src && opts.mode === 'toss';
@@ -232,7 +232,6 @@
   }
   function closeModal() {
     $('#modal').hidden = true; $('#modalCard').innerHTML = '';
-    window.removeEventListener('deviceorientation', onOrient);
   }
   $('#modal').addEventListener('click', (e) => {
     if (e.target.id === 'modal' || e.target.closest('[data-close]')) closeModal();
@@ -938,25 +937,8 @@
     showTab('album');
   }
 
-  // Einzelansicht mit Holo-Neigung
-  let tiltEl = null;
-  function onOrient(e) {
-    if (!tiltEl || e.gamma == null) return;
-    const rx = Math.max(-20, Math.min(20, (e.beta - 40) / 2));
-    const ry = Math.max(-20, Math.min(20, e.gamma / 2));
-    applyTilt(rx, ry);
-  }
-  function applyTilt(rx, ry) {
-    if (!tiltEl) return;
-    const c3d = tiltEl.querySelector('canvas.coin3d');
-    if (c3d) { window.Coin3D.tilt(c3d, -rx * Math.PI / 180 * 1.6, ry * Math.PI / 180 * 1.6); return; }
-    tiltEl.style.transform = `rotateX(${-rx}deg) rotateY(${ry}deg)`;
-    tiltEl.style.setProperty('--gx', 50 + ry * 2.2 + '%');
-    tiltEl.style.setProperty('--gy', 50 + rx * 2.2 + '%');
-    const inner = tiltEl.querySelector('.note, .coin');
-    if (inner) inner.style.filter = (inner.classList.contains('ed-tinte') ? 'grayscale(1) contrast(1.25) ' : '') + `hue-rotate(${ry * 1.5}deg)`;
-  }
-
+  // Einzelansicht: Scheine und Münzen liegen gerade und kippen nicht mit.
+  // Münzen lassen sich per Ziehen drehen, „Wenden“ zeigt die Rückseite.
   function openDetail(id, exUid) {
     const list = S.items.filter((i) => i.id === id);
     if (!list.length) return;
@@ -979,7 +961,7 @@
       facts.push(['Exemplare', `${list.length}${list.length > 1 ? ` (zeige ${idx + 1})` : ''}`], ['Gefunden', new Date(it.foundAt).toLocaleString('de-DE')]);
       const title = coin ? `${coinLabel(it.cents)} · ${it.countryName}` : `${it.denom} € · ${D.MOTIFS[it.theme][it.denom].front}`;
       openModal(`<h2>${esc(title)}</h2>
-        <div class="detail-stage" id="detailStage"><div class="tilt ${coin ? 'coin-tilt' : ''}" id="tilt">${coin ? coinHTML(it, { mode: 'tilt', drag: true }) : noteHTML(it, { back })}${coin ? '' : '<div class="glare"></div>'}</div></div>
+        <div class="detail-stage" id="detailStage"><div class="tilt ${coin ? 'coin-tilt' : ''}" id="tilt">${coin ? coinHTML(it, { mode: 'flat', drag: true }) : noteHTML(it, { back })}</div></div>
         ${coin ? `<p class="image-credit" style="text-align:center;margin:-6px 0 12px">Bild: ${it.commemorative ? 'Gedenkmünze' : 'Nationalseite'} · Motiv des Ausgabelands ${esc(it.countryName)} · Sammlung ${esc(D.COIN_IMAGE_SOURCE)}</p>` : `<p class="image-credit" style="text-align:center;margin:-6px 0 12px">Bild: © EZB · Gestaltungsvorschlag ${esc(design.id)}, ${esc(design.designer)}</p>`}
         <dl class="facts">${facts.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${k === 'Seriennummer' || k === 'Land' || k === 'Druckerei' ? v : esc(v)}</dd>`).join('')}</dl>
         <div class="button-row">
@@ -987,14 +969,7 @@
           ${list.length > 1 ? '<button class="btn" id="nextEx">Nächstes Exemplar</button><button class="btn hot" id="tradeEx">Tauschen</button>' : ''}
           <button class="btn primary" data-close>Schließen</button>
         </div>`, (card) => {
-        tiltEl = $('#tilt', card);
         const ds = $('#detailStage', card);
-        ds.addEventListener('pointermove', (e) => {
-          const r = ds.getBoundingClientRect();
-          const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
-          applyTilt(y * 30, x * 30);
-        });
-        ds.addEventListener('pointerleave', () => applyTilt(0, 0));
         let sx = null;
         ds.addEventListener('pointerdown', (e) => (sx = e.clientX));
         const flip = () => {
@@ -1003,7 +978,6 @@
           back = !back; draw();
         };
         ds.addEventListener('pointerup', (e) => { if (!coin && sx != null && Math.abs(e.clientX - sx) > 60) flip(); sx = null; });
-        window.addEventListener('deviceorientation', onOrient);
         const fb = $('#flipBtn', card); if (fb) fb.onclick = flip;
         const nx = $('#nextEx', card); if (nx) nx.onclick = () => { idx = (idx + 1) % list.length; back = false; draw(); };
         const tx = $('#tradeEx', card); if (tx) tx.onclick = () => openTradeOffer(id);
