@@ -47,8 +47,10 @@ js/engine.js        Zufall und Pack-Logik ohne DOM, in Node testbar
 js/app.js           Oberfläche, Opening-Ablauf, Album, Spielstand
 test/engine.test.js Prüft die Zahlen aus dem Konzept
 test/images.test.js Prüft, dass jede Karte ein Bild hat
-images/designs/     EZB-Originale (120 Bilder, nur im Repo, nicht online)
-images/cards/       Kartenbilder im Hochformat, 400 × 760 px, für die App
+images/designs/     EZB-Originale Banknoten (120 Bilder, nur im Repo, nicht online)
+images/cards/       Banknoten-Kartenbilder im Hochformat, 400 × 760 px
+images/coins/       EZB-Münz-Originale (200+ Bilder, nur im Repo, nicht online)
+images/coin_cards/  Münz-Kartenbilder im Hochformat, 400 × 760 px
 scripts/            Download der Originale, Erzeugen der Kartenbilder
 docs/konzept.md     Konzept und App-Spezifikation
 ```
@@ -73,3 +75,5 @@ Der Test rechnet die Verteilung exakt aus und prüft die Zahlen aus dem Konzept:
 ## Bildnachweis
 
 Banknotenmotive: © Europäische Zentralbank, [Gestaltungsvorschläge für die künftigen Euro-Banknoten](https://www.ecb.europa.eu/euro/banknotes/future_banknotes/html/design-proposals.de.html) (2026), Entwürfe A–J der jeweils genannten Gestalterinnen und Gestalter. Verwendet im Rahmen redaktioneller Berichterstattung; für die Karten auf Hochformat zugeschnitten und Querformat-Entwürfe gedreht. Die Entwürfe sind kein gesetzliches Zahlungsmittel.
+
+Münzmotive: © Europäische Zentralbank, [Euro-Münzen](https://www.ecb.europa.eu/euro/coins/html/index.de.html). Verwendet im Rahmen redaktioneller Berichterstattung; für die Karten auf Hochformat zugeschnitten. Die Münzbilder zeigen die Nationalseiten der 25 Euro-Prägeländer.
