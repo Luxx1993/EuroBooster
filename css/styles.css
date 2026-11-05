@@ -458,3 +458,40 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .sleeve .note { font-size: 5px; }
   .coin-grid { grid-template-columns: repeat(8, 1fr); }
 }
+
+/* ---------- Tausch ---------- */
+.trade-offer { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; margin: 8px 0 12px; }
+.trade-offer .side { text-align: center; font-size: 13px; }
+.trade-offer .side .who { color: var(--muted); font-size: 12px; margin-bottom: 6px; }
+.trade-offer .side .card { width: min(100%, 120px); margin: 0 auto 8px; font-size: 7.5px; }
+.trade-offer .side .card .coin { font-size: 16px; }
+.trade-offer .swap { font-size: 26px; color: var(--mint); }
+.trade-stage {
+  position: fixed; inset: 0; z-index: 55; overflow: hidden;
+  background: radial-gradient(circle at 50% 30%, #18204a, var(--vault) 70%);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 16px;
+}
+.trade-head { position: absolute; top: calc(18px + env(safe-area-inset-top)); left: 16px; right: 16px; text-align: center; font-family: var(--font-head); font-weight: 700; font-size: 17px; }
+.trade-head .muted { font-weight: 500; font-size: 13px; display: block; margin-top: 2px; }
+.trade-slot { width: min(48vw, 220px, calc((100dvh - 300px) / 1.9)); font-size: min(14.5px, 3.2vw, calc((100dvh - 300px) / 27)); position: relative; }
+.trade-slot.coinish { width: min(52vw, 200px); font-size: 26px; }
+.trade-slot .glow { position: absolute; inset: -14%; border-radius: 30%; filter: blur(28px); background: var(--mint); opacity: 0; z-index: -1; transition: opacity .5s ease; }
+.trade-slot .glow.on { opacity: .7; }
+.trade-caption { text-align: center; font-family: var(--font-head); min-height: 64px; }
+.trade-caption .t-title { font-size: 20px; font-weight: 700; }
+.trade-caption .t-sub { color: var(--muted); font-size: 14px; margin-top: 2px; }
+.trade-out { animation: trade-out 1s cubic-bezier(.55, 0, .8, .2) forwards; }
+.trade-in { animation: trade-in 1s cubic-bezier(.15, .85, .3, 1.12) both; }
+@keyframes trade-out {
+  0% { transform: none; }
+  18% { transform: translateY(14px) scale(.97); }
+  100% { transform: translateY(-130vh) rotate(-9deg); }
+}
+@keyframes trade-in {
+  from { transform: translateY(-130vh) rotate(10deg); }
+  to { transform: none; }
+}
+.reduce-motion .trade-out { animation: fade-out .3s ease forwards !important; }
+.reduce-motion .trade-in { animation: fade-in .3s ease both !important; }
+@keyframes fade-out { to { opacity: 0; } }
+@keyframes fade-in { from { opacity: 0; } }

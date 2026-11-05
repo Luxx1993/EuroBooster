@@ -105,10 +105,11 @@
     };
   }
 
-  function makePrototype(rng, godPack) {
+  function makePrototype(rng, godPack, fixed) {
     const protos = D.DESIGNS.filter((d) => d.id !== D.WINNER_DESIGN);
-    const design = pickWeighted(rng, protos.map((d) => [d, D.PROTOTYPE_WEIGHTS[d.id] || 1]));
-    const denom = D.DENOMS[randInt(rng, 0, D.DENOMS.length - 1)];
+    const design = fixed ? D.DESIGNS.find((d) => d.id === fixed.design)
+      : pickWeighted(rng, protos.map((d) => [d, D.PROTOTYPE_WEIGHTS[d.id] || 1]));
+    const denom = fixed ? fixed.denom : D.DENOMS[randInt(rng, 0, D.DENOMS.length - 1)];
     return {
       kind: 'proto',
       id: noteId(design.id, denom),
@@ -178,6 +179,41 @@
   }
 
   // ---------------------------------------------------------------------------
+  // Tausch: 1:1 zum gleichen Nennwert – weil es ja Geld ist.
+  // Bevorzugt wird angeboten, was dem Nutzer noch fehlt.
+  // ---------------------------------------------------------------------------
+  function makeTradeOffer(rng, item, ownedIds) {
+    rng = rng || Math.random;
+    const owned = ownedIds || new Set();
+    const pick = (arr) => arr[randInt(rng, 0, arr.length - 1)];
+    if (item.kind === 'note') {
+      // Gleiche Stückelung, andere Druckerei und Seriennummer, vielleicht eine Edition
+      return makeNote(rng, item.denom, false);
+    }
+    if (item.kind === 'proto') {
+      const all = [];
+      for (const d of D.DESIGNS) {
+        if (d.id === D.WINNER_DESIGN) continue;
+        for (const denom of D.DENOMS) all.push({ design: d.id, denom });
+      }
+      const others = all.filter((x) => noteId(x.design, x.denom) !== item.id);
+      const missing = others.filter((x) => !owned.has(noteId(x.design, x.denom)));
+      return makePrototype(rng, false, pick(missing.length ? missing : others));
+    }
+    // Münzen: gleicher Wert aus einem anderen Land
+    const pool = D.COIN_COUNTRIES.filter((c) => c.code !== item.country);
+    if (item.commemorative) {
+      const year = randInt(rng, D.COMMEMORATIVE_YEARS[0], D.COMMEMORATIVE_YEARS[1]);
+      const missing = pool.filter((c) => !owned.has(gedenkId(c.code, year)));
+      const c = pickWeighted(rng, (missing.length ? missing : pool).map((x) => [x, x.weight]));
+      return { kind: 'coin', id: gedenkId(c.code, year), cents: 200, country: c.code, countryName: c.name, rareCountry: !!c.rare, commemorative: year, edition: null };
+    }
+    const missing = pool.filter((c) => !owned.has(coinId(c.code, item.cents)));
+    const c = pickWeighted(rng, (missing.length ? missing : pool).map((x) => [x, x.weight]));
+    return { kind: 'coin', id: coinId(c.code, item.cents), cents: item.cents, country: c.code, countryName: c.name, rareCountry: !!c.rare, commemorative: null, edition: null };
+  }
+
+  // ---------------------------------------------------------------------------
   // IDs und Katalog
   // ---------------------------------------------------------------------------
   function noteId(design, denom) { return 'N-' + design + '-' + denom; }
@@ -232,7 +268,7 @@
 
   root.EB = {
     pickWeighted, classifySerial, makeSerial, rollEdition,
-    openNotePack, openCoinPack,
+    openNotePack, openCoinPack, makeTradeOffer,
     noteId, coinId, gedenkId,
     valueDistribution, expectedValue, probAtLeast, median, seeded,
   };

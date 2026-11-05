@@ -25,6 +25,7 @@ Der Spielstand liegt im `localStorage` des Browsers und lässt sich im Profil (T
 | Album | Echte Serie, Prototypen (9 Entwürfe × 6), Münzen (25 Länder × 8), Gedenkmünzen als Zeitleiste, Tresor für Special Editions; Set-Bonus bei voller Seite |
 | Einzelansicht | Holo-Neigung per Maus oder Gerätesensor, Wenden per Wischen, Steckbrief mit Seriennummer, Druckerei, Edition, Exemplaren |
 | Special Editions | Holo, Glitzer, Tinte, Gold, Alternativmotiv, Fehldruck, Zentralbank-Pack (God Pack) |
+| Tausch | Doppelte 1:1 zum gleichen Nennwert mit simulierten Sammlern tauschen; bevorzugt kommt, was dir fehlt. Der eigene Schein fliegt über die obere Bildschirmkante hinaus, der neue kommt von oben herein |
 | Wallet | Guthaben, Scheinstapel, Daily Drop, Haltelimit („Kartenbox ist voll“) |
 | Einstellungen | Haptik, Ton, Bewegung reduzieren, Ausgabelimit pro Tag |
 

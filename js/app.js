@@ -950,7 +950,7 @@
         <dl class="facts">${facts.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${k === 'Seriennummer' || k === 'Land' || k === 'Druckerei' ? v : esc(v)}</dd>`).join('')}</dl>
         <div class="button-row">
           ${coin ? '' : '<button class="btn" id="flipBtn">Wenden</button>'}
-          ${list.length > 1 ? '<button class="btn" id="nextEx">Nächstes Exemplar</button>' : ''}
+          ${list.length > 1 ? '<button class="btn" id="nextEx">Nächstes Exemplar</button><button class="btn hot" id="tradeEx">Tauschen</button>' : ''}
           <button class="btn primary" data-close>Schließen</button>
         </div>`, (card) => {
         tiltEl = $('#tilt', card);
@@ -967,6 +967,7 @@
         window.addEventListener('deviceorientation', onOrient);
         const fb = $('#flipBtn', card); if (fb) fb.onclick = () => { back = !back; draw(); };
         const nx = $('#nextEx', card); if (nx) nx.onclick = () => { idx = (idx + 1) % list.length; back = false; draw(); };
+        const tx = $('#tradeEx', card); if (tx) tx.onclick = () => openTradeOffer(id);
       });
     };
     draw();
@@ -980,9 +981,101 @@
     for (const it of S.items) counts.set(it.id, (counts.get(it.id) || []).concat(it));
     const dups = [...counts.values()].filter((l) => l.length > 1).sort((a, b) => b.length - a.length);
     $('#tradeList').innerHTML = dups.length ? `<div class="album-page"><h3>Deine Doppelten</h3><div class="sub">${dups.reduce((s, l) => s + l.length - 1, 0)} Exemplare zum Tauschen</div>
-      <div class="sleeves">${dups.map((l) => `<button class="sleeve" data-detail="${l[0].id}"><span class="count">×${l.length}</span>${l[0].kind === 'coin' ? `<div style="width:60%;margin:0 auto">${coinHTML(l[0])}</div>` : noteHTML(l[0], { hideSerial: true })}</button>`).join('')}</div></div>`
+      <div class="sleeves">${dups.map((l) => `<button class="sleeve" data-trade="${l[0].id}" aria-label="Tauschen: ${esc(describe(l[0]))}"><span class="count">×${l.length}</span>${l[0].kind === 'coin' ? `<div style="width:80%;margin:0 auto">${coinHTML(l[0])}</div>` : noteHTML(l[0], { hideSerial: true })}</button>`).join('')}</div></div>`
       : '<div class="empty-state">Noch keine Doppelten. Weiter öffnen – rein geldpolitisch betrachtet.</div>';
-    $$('#tradeList [data-detail]').forEach((b) => b.addEventListener('click', () => openDetail(b.dataset.detail)));
+    $$('#tradeList [data-trade]').forEach((b) => b.addEventListener('click', () => openTradeOffer(b.dataset.trade)));
+  }
+
+  // Simulierte Tauschpartner, bis es echte andere Nutzer gibt
+  const PARTNERS = [
+    'Ana aus Lissabon', 'Jonas aus Tallinn', 'Giulia aus Bologna', 'Mateo aus Valencia',
+    'Eva aus Ljubljana', 'Lena aus Graz', 'Niamh aus Cork', 'Tomás aus Bratislava',
+  ];
+
+  // Welches Exemplar geht weg? Das unspektakulärste, damit Special Editions bleiben.
+  function exemplarToGive(id) {
+    const list = S.items.filter((i) => i.id === id);
+    const plain = list.filter((i) => !i.edition && !i.rareSerial);
+    return (plain.length ? plain : list).slice(-1)[0];
+  }
+
+  function openTradeOffer(id) {
+    if (ownedCount(id) < 2) return toast('Getauscht werden nur Doppelte.');
+    const given = exemplarToGive(id);
+    const owned = new Set(S.items.map((i) => i.id));
+    const partner = PARTNERS[Math.floor(Math.random() * PARTNERS.length)];
+    const offer = EB.makeTradeOffer(Math.random, given, owned);
+    const card = (it) => `<div class="card">${itemHTML(it, { hideSerial: true })}</div>`;
+    openModal(`<h2>Tausch 1:1</h2>
+      <div class="trade-offer">
+        <div class="side"><div class="who">Du gibst</div>${card(given)}<div>${esc(describe(given))}</div></div>
+        <div class="swap" aria-hidden="true">⇄</div>
+        <div class="side"><div class="who">${esc(partner)} gibt</div>${card(offer)}<div>${esc(describe(offer))}</div>
+          ${owned.has(offer.id) ? '' : '<span class="badge new">NEU für dich</span>'}</div>
+      </div>
+      <p class="muted" style="font-size:13px;margin:0 0 6px">Gleicher Nennwert, weil es ja Geld ist. Du gibst ein Doppeltes ab und behältst mindestens ein Exemplar.</p>
+      <div class="button-row">
+        <button class="btn" id="otherOffer">Anderes Angebot</button>
+        <button class="btn primary" id="doTrade">Tauschen</button>
+      </div>
+      <div class="button-row" style="margin-top:0"><button class="btn" data-close>Abbrechen</button></div>`, (m) => {
+      $('#otherOffer', m).onclick = () => openTradeOffer(id);
+      $('#doTrade', m).onclick = () => { closeModal(); runTrade(given, offer, partner); };
+    });
+  }
+
+  function commitTrade(given, received, partner) {
+    S.items = S.items.filter((i) => i.uid !== given.uid);
+    const rec = Object.assign({}, received, { uid: uid(), foundAt: Date.now(), source: 'tausch', partner });
+    rec.isNew = ownedCount(rec.id) === 0;
+    S.items.push(rec);
+    S.stats.trades = (S.stats.trades || 0) + 1;
+    save();
+    return rec;
+  }
+
+  const sleep = (ms) => new Promise((r) => setTimeout(r, S.settings.reduceMotion ? Math.min(ms, 350) : ms));
+
+  async function runTrade(given, offer, partner) {
+    const rec = commitTrade(given, offer, partner);
+    const ts = $('#tradeStage'), slot = $('#tradeSlot'), cap = $('#tradeCaption'), actions = $('#tradeActions');
+    const coinish = (it) => it.kind === 'coin';
+    const show = (it, cls) => {
+      slot.classList.toggle('coinish', coinish(it));
+      slot.innerHTML = `<div class="glow"></div><div class="${cls}">${itemHTML(it)}</div>`;
+    };
+    ts.hidden = false; actions.hidden = true;
+    document.body.style.overflow = 'hidden';
+    $('#tradeHead').innerHTML = `Tausch mit ${esc(partner)}<span class="muted">1:1 – weil es ja Geld ist</span>`;
+
+    // 1. Eigener Schein liegt kurz da, dann geht er über die obere Kante raus
+    show(given, '');
+    cap.innerHTML = `<div class="t-title">Du gibst</div><div class="t-sub">${esc(describe(given))}</div>`;
+    await sleep(900);
+    slot.lastElementChild.classList.add('trade-out');
+    noise(0.5, 0.12); haptic(1);
+    await sleep(1000);
+
+    // 2. Neuer Schein kommt von oben rein
+    cap.innerHTML = '';
+    show(rec, 'trade-in');
+    noise(0.4, 0.08);
+    await sleep(950);
+    slot.querySelector('.glow').classList.add('on');
+    sfx.coin(); haptic(2);
+    cap.innerHTML = `<div class="t-title">Du bekommst</div><div class="t-sub">${esc(describe(rec))}</div>
+      <div>${rec.isNew ? '<span class="badge new">NEU!</span>' : ''}${rec.edition ? `<span class="badge ed">${esc(editionName(rec.edition))}</span>` : ''}${rec.rareSerial ? `<span class="badge serial">${esc(rec.rareSerial)}</span>` : ''}</div>`;
+    actions.hidden = false;
+    $('#tradeDone').focus();
+    $('#tradeDone').onclick = () => closeTrade();
+    $('#tradeToAlbum').onclick = () => { closeTrade(); openAlbumAt(rec); };
+  }
+
+  function closeTrade() {
+    $('#tradeStage').hidden = true;
+    $('#tradeSlot').innerHTML = '';
+    document.body.style.overflow = '';
+    render();
   }
 
   // ---------------------------------------------------------------------------
@@ -1002,6 +1095,7 @@
         <div class="stat" style="grid-column:1/-1"><div class="v" style="font-size:16px">${st.best ? esc(st.best.label) : '–'}</div><div class="k">Bester Pull</div></div>
         <div class="stat"><div class="v">${uniq}</div><div class="k">Verschiedene Stücke</div></div>
         <div class="stat"><div class="v">${S.items.length}</div><div class="k">Exemplare gesamt</div></div>
+        <div class="stat"><div class="v">${st.trades || 0}</div><div class="k">Tausche</div></div>
       </div>
       <h3 style="font-family:var(--font-head);margin:0 0 4px">Einstellungen</h3>
       <div class="settings">

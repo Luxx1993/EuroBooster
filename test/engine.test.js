@@ -78,3 +78,25 @@ test('Editionen: rund 11,2 % Special Editions je Schein', () => {
   for (let i = 0; i < n; i++) if (EB.rollEdition(rng)) hits++;
   near(hits / n, 0.112, 0.003, 'Anteil');
 });
+
+test('Tausch: immer 1:1 zum gleichen Nennwert', () => {
+  const rng = EB.seeded(3);
+  for (let i = 0; i < 300; i++) {
+    const p = EB.openNotePack(rng);
+    const c = EB.openCoinPack(rng);
+    for (const it of [...p.items, p.bonus, ...c.items]) {
+      const o = EB.makeTradeOffer(rng, it, new Set());
+      assert.equal(o.kind, it.kind);
+      if (it.kind === 'note') assert.equal(o.denom, it.denom);
+      if (it.kind === 'coin') assert.equal(o.cents, it.cents);
+      if (it.kind !== 'note') assert.notEqual(o.id, it.id, 'Prototypen und Münzen: anderes Stück');
+    }
+  }
+});
+
+test('Tausch: bevorzugt fehlende Stücke', () => {
+  const rng = EB.seeded(9);
+  const coin = { kind: 'coin', id: EB.coinId('DE', 100), cents: 100, country: 'DE' };
+  const owned = new Set(D.COIN_COUNTRIES.filter((c) => c.code !== 'VA').map((c) => EB.coinId(c.code, 100)));
+  for (let i = 0; i < 20; i++) assert.equal(EB.makeTradeOffer(rng, coin, owned).country, 'VA');
+});

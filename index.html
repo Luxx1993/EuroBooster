@@ -70,7 +70,7 @@
       <section class="view" id="view-trade" data-view="trade" hidden>
         <h2 class="view-title">Tauschbörse</h2>
         <div class="panel">
-          <p><strong>Tausch 1:1 – weil es ja Geld ist.</strong> Im Browser-Prototyp gibt es noch keine anderen Sammler. Hier stehen deine Doppelten, die du anbieten könntest.</p>
+          <p><strong>Tausch 1:1 – weil es ja Geld ist.</strong> Tippe auf ein Doppeltes, um ein Angebot zu bekommen. Im Prototyp tauschen simulierte Sammler aus dem Euroraum mit dir.</p>
         </div>
         <div id="tradeList"></div>
       </section>
@@ -97,6 +97,17 @@
     <div class="stage-tray" id="stageTray"></div>
     <div class="stage-hint" id="stageHint"></div>
     <div class="fx" id="fx" aria-hidden="true"></div>
+  </div>
+
+  <!-- Tausch-Animation: eigener Schein geht oben raus, neuer kommt oben rein -->
+  <div class="trade-stage" id="tradeStage" hidden aria-live="polite">
+    <div class="trade-head" id="tradeHead"></div>
+    <div class="trade-slot" id="tradeSlot"></div>
+    <div class="trade-caption" id="tradeCaption"></div>
+    <div class="button-row trade-actions" id="tradeActions" hidden>
+      <button class="btn" id="tradeToAlbum">Im Album ansehen</button>
+      <button class="btn primary" id="tradeDone">Fertig</button>
+    </div>
   </div>
 
   <!-- Modal -->
