@@ -63,5 +63,5 @@ Der Test rechnet die Verteilung exakt aus und prüft die Zahlen aus dem Konzept:
 - **Prototyp-Seltenheit:** Gleichverteilt, bis das Umfrageergebnis bekannt ist (`PROTOTYPE_WEIGHTS`).
 - **Farben der Stückelungen:** Farbcodes der heutigen Serie.
 - **Format:** Alle Scheine werden hochkant dargestellt, wie bei den Hochformat-Entwürfen D, G, I und J.
-- **Bilder:** Keine Reproduktionen der EZB-Entwürfe – Platzhalter mit Motivname und Stückelungsfarbe.
+- **Bilder:** Die echten EZB-Design-Entwürfe sind nun in `images/designs/design_[A-J]/` verfügbar (120 Bilder: 10 Designs × 6 Stückelungen × 2 Seiten). Die App verwendet weiterhin Platzhalter, aber die Bilder können für erweiterte Funktionen genutzt werden.
 - **Wirtschaft:** Der Nennwert der Inhalte wird dem Guthaben gutgeschrieben, das Exemplar landet im Album. So kostet ein Schein-Booster im Schnitt 4,25 €.
