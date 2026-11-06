@@ -186,6 +186,9 @@
   const COIN_IMAGE_SOURCE = 'github.com/lucephile/euro-coin-images';
   const IMAGE_CREDIT = 'Banknoten: © Europäische Zentralbank, Gestaltungsvorschläge für die künftigen Euro-Banknoten (2026); Querformat-Entwürfe für die Karten um 90° gedreht. Münzen: Nationalseiten und Gedenkmünzen der Euro-Länder, Motive der jeweiligen Ausgabeländer; Bilder aus der Sammlung ' + COIN_IMAGE_SOURCE + '. Verwendet im Rahmen redaktioneller Berichterstattung.';
 
+  // Öffentliche Adresse für den Link beim Teilen (wenn lokal geöffnet)
+  const SITE_URL = 'https://luxx1993.github.io/EuroBooster/';
+
   const STARTING_BALANCE = 500;
   const DAILY_DROP_RANGE = [1, 5]; // Cent
 
@@ -193,6 +196,6 @@
     DENOMS, DENOM_COLORS, MOTIFS, DESIGNS, DESIGN_WEIGHTS, PRINTERS,
     NOTE_BOOSTER, COIN_BOOSTER, COIN_COUNTRIES, HIT_COUNTRIES, COMMEMORATIVE_CHANCE,
     COMMEMORATIVE_YEARS, COMMEMORATIVES, COIN_VALUES, EDITIONS, GOD_PACK_CHANCE, RARITY,
-    SPECIAL_SERIAL_CHANCE, STARTING_BALANCE, DAILY_DROP_RANGE, CARD_IMAGES, COIN_IMAGES, COIN_IMAGE_SOURCE, IMAGE_CREDIT,
+    SPECIAL_SERIAL_CHANCE, STARTING_BALANCE, DAILY_DROP_RANGE, CARD_IMAGES, SITE_URL, COIN_IMAGES, COIN_IMAGE_SOURCE, IMAGE_CREDIT,
   };
 })(typeof window !== 'undefined' ? window : globalThis);
