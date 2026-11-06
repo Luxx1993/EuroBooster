@@ -30,6 +30,7 @@ Der Spielstand liegt im `localStorage` des Browsers und lässt sich im Profil (T
 | Shop | Schein-Booster (50 €, 5 Scheine) und Münz-Booster (3 €, 10 Münzen), offene Quoten pro Slot und Verteilung des Packwerts |
 | Pack-Opening | Aufreißen per Wischen über die Oberkante (Doppeltipp oder Enter als Alternative), Vorahnungs-Licht in der Farbe des besten Scheins, gewöhnliche Slots einzeln, Trennkarte, Stufen-Reveal (Druckland → Druckerei → Entwurf), Hit-Effekte, Seriennummer tippt sich ein |
 | Übersicht | Aufgefächerte Scheine mit Hit in der Mitte, hochlaufender Packwert, „Bank gewinnt“ oder „Du schlägst die EZB“, Ins Album / Noch ein Pack / Teilen |
+| Teilen | Erzeugtes Bild (1080 × 1350, JPEG): alle Scheine aufgefächert bzw. alle Münzen; bei besonderen Funden (Special Edition, seltene Seriennummer, Gedenkmünze, seltenes Land) die bis zu drei seltensten groß mit Effekt und Beschriftung. Dazu Packwert, Urteil und Link zur Seite. Auf dem Handy über das Teilen-Menü, sonst Bild herunterladen und Text mit Link kopieren |
 | Münzen | Im Code gerenderte 3D-Münzen (WebGL): Metall je Wert (Kupfer, Nordisches Gold, Bimetall bei 1 € und 2 €), Dicke und geriffelter Rand, Relief aus dem Foto der Nationalseite, erzeugte Gemeinschaftsseite. Im Pack ein Münzwurf: von unten hereingeworfen, Landung auf der Zahl (für alle Länder gleich), dann Umdrehen auf die Bildseite – erst dann steht das Land fest. Im Album liegen sie gerade und unbewegt mit der Bildseite nach oben; in der Einzelansicht lassen sie sich per Ziehen 360° drehen, „Wenden“ zeigt die Rückseite. Im Hit-Slot echte 2-€-Gedenkmünzen (568 aus 22 Ländern, 2004–2026). Ohne WebGL erscheint eine gezeichnete Münze |
 | Album | Scheine (10 Entwürfe × 6 Stückelungen = 60), Münzen (25 Länder × 8), Gedenkmünzen als Zeitleiste, Tresor für Special Editions; Set-Bonus bei voller Seite |
 | Einzelansicht | Schein bzw. Münze liegt gerade und kippt nicht mit; „Wenden“ (bei Scheinen auch Wischen) zeigt die Rückseite, Münzen lassen sich per Ziehen 360° drehen. Steckbrief mit Seriennummer, Druckerei, Edition, Exemplaren |
@@ -54,6 +55,7 @@ images/coins/       Münz-Originale: Nationalseiten (25 Länder × 8 Werte) und 
 images/coin_web/    Runde Relief-Vorlagen (256 px, WebP) für die 3D-Münzen, online
 js/coin3d.js        Münzen in 3D: WebGL-Raytracing mit Metall, Rand, Relief und erzeugter Rückseite
 js/coins.js         Verzeichnis der Gedenkmünzen (erzeugt)
+js/share.js         Bild zum Teilen eines geöffneten Packs
 scripts/            Download der Originale, Erzeugen der Kartenbilder
 docs/konzept.md     Konzept und App-Spezifikation
 ```

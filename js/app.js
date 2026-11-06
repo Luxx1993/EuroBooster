@@ -822,16 +822,55 @@
       if (free) return openPack(free.uid);
       closeStage(); buy(type);
     };
-    $('#share').onclick = () => share(result);
+    // Teilen-Bild schon jetzt im Hintergrund bauen: Beim Tippen muss das
+    // Teilen-Menü sofort aufgehen, sonst blockieren manche Browser es.
+    const shareJob = window.EBShare ? window.EBShare.build(result, shareHelpers).catch(() => null) : Promise.resolve(null);
+    $('#share').onclick = () => share(result, shareJob);
   }
 
-  async function share(result) {
+  // Hilfen für js/share.js
+  const shareHelpers = {
+    coinImage,
+    itemValue,
+    editionName,
+    fmt: (v) => fmt.format(v),
+    glowOf: (it) => { const g = rarityOf(it).glow; return g === 'rainbow' ? '#ffffff' : g; },
+    shortName: (it) => (it.kind === 'coin'
+      ? `${coinLabel(it.cents)} · ${it.countryName}`
+      : `${it.denom} € · ${D.MOTIFS[it.theme][it.denom].front} · Entwurf ${it.design}`),
+  };
+
+  // Teilen: Bild (alle Scheine/Münzen oder die besondere Karte) + Text mit Link.
+  // Handy: Teilen-Menü mit Bild. Sonst: Bild herunterladen, Text kopieren.
+  async function share(result, job) {
+    const out = await job;
+    const url = window.EBShare ? window.EBShare.pageUrl() : D.SITE_URL;
     const top = result.items.reduce((a, b) => (itemValue(b) > itemValue(a) ? b : a));
-    const text = `Mein EUROPACK: ${fmt.format(result.value)} Packwert für ${fmt.format(result.price)}. Bester Pull: ${describe(top)}. ${result.value > result.price ? 'Ich schlage die EZB!' : 'Die Bank gewinnt.'}`;
+    const text = out ? out.text
+      : `Mein EUROPACK: ${fmt.format(result.value)} Packwert für ${fmt.format(result.price)}. Bester Pull: ${describe(top)}.\nSelbst öffnen: ${url}`;
+    const file = out && out.blob && typeof File === 'function'
+      ? new File([out.blob], `europack-${Date.now()}.jpg`, { type: 'image/jpeg' }) : null;
     try {
-      if (navigator.share) await navigator.share({ title: 'EUROPACK', text });
-      else { await navigator.clipboard.writeText(text); toast('In die Zwischenablage kopiert.'); }
-    } catch (e) { /* abgebrochen */ }
+      if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: 'EUROPACK', text });
+        return;
+      }
+      if (file) {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(file);
+        a.download = file.name;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      }
+      if (navigator.share) {
+        await navigator.share({ title: 'EUROPACK', text });
+      } else {
+        await navigator.clipboard.writeText(text);
+        toast(file ? 'Bild gespeichert, Text mit Link kopiert.' : 'Text mit Link kopiert.');
+      }
+    } catch (e) {
+      if (e && e.name !== 'AbortError') toast('Teilen hat nicht geklappt.');
+    }
   }
 
   // ---------------------------------------------------------------------------

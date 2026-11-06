@@ -335,7 +335,8 @@ void main() {
   function draw(canvas, spec, pose, front, back) {
     const css = canvas.clientWidth || canvas.width || 96;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const size = Math.max(16, Math.min(1024, Math.round(css * dpr)));
+    // Feste Größe für Einzelbilder (Teilen), sonst nach Anzeigegröße
+    const size = canvas._fixedSize ? canvas.width : Math.max(16, Math.min(1024, Math.round(css * dpr)));
     if (canvas.width !== size) { canvas.width = size; canvas.height = size; }
     const ss = Math.min(1024, size * 2); // doppelt rendern, weich verkleinern
     if (glCanvas.width !== ss) { glCanvas.width = ss; glCanvas.height = ss; }
@@ -572,6 +573,17 @@ void main() {
 
   window.Coin3D = {
     supported: !!gl,
+    // Münze als eigenständiges Bild rendern (z. B. für das Teilen-Bild)
+    renderStill(spec, size, p) {
+      if (!gl) return Promise.reject(new Error('Kein WebGL'));
+      return Promise.all([photoTexture(spec.src), backTexture(spec.cents)]).then(([front, back]) => {
+        const c = document.createElement('canvas');
+        c.width = c.height = Math.min(1024, size);
+        c._fixedSize = true;
+        draw(c, spec, p || STATIC_POSE, front, back);
+        return c;
+      });
+    },
     // Zeitpunkte des Münzwurfs in ms: gelandet (Zahl), Umdrehen beginnt, fertig
     tossTiming(kind) {
       const r = tossTiming(kind);
