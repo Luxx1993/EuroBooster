@@ -94,7 +94,7 @@
   }
 
   // Ein Schein mit Edition, Rahmen in Stückelungsfarbe und Edition-Plakette
-  async function renderNote(it, w, editionName) {
+  async function renderNote(it, w, editionName, withBadge = true) {
     const h = Math.round(w * 1.9);
     const c = document.createElement('canvas');
     c.width = w; c.height = h;
@@ -177,7 +177,7 @@
     x.strokeStyle = color;
     roundRect(x, x.lineWidth / 2, x.lineWidth / 2, w - x.lineWidth, h - x.lineWidth, r);
     x.stroke();
-    if (ed) pill(x, editionName(ed), w - w * 0.06, h - w * 0.07, Math.round(w * 0.075), '#0B1020', '#fff', 'right');
+    if (ed && withBadge) pill(x, editionName(ed), w - w * 0.06, h - w * 0.07, Math.round(w * 0.075), '#0B1020', '#fff', 'right');
     return c;
   }
 
@@ -253,17 +253,80 @@
     x.fillText(filled, W / 2, 272, W - 80);
   }
 
-  function footer(x, result, url, fmt) {
-    const v = result.value, p = result.price;
-    const verdict = p === 0 ? `Bonus-Pack: ${fmt(v)} geschenkt`
-      : v > p ? `${fmt(v)} – Du schlägst die EZB`
-      : v === p ? `${fmt(v)} – Unentschieden mit der EZB`
-      : `${fmt(v)} von ${fmt(p)} – Bank gewinnt`;
-    x.textAlign = 'center'; x.textBaseline = 'alphabetic';
-    x.font = `700 50px ${FONT}`;
-    x.fillStyle = v > p || p === 0 ? '#6FE3C3' : '#FFFFFF';
-    x.fillText(verdict, W / 2, 1192);
-    pill(x, 'Selbst öffnen: ' + url.replace(/^https?:\/\//, '').replace(/\/$/, ''), W / 2, 1272, 30, 'rgba(11,16,32,0.75)', '#fff', 'center');
+  // Querformat-Entwürfe liegen in der App gedreht im Hochformat. Fürs
+  // Teilen-Bild werden besondere Scheine wieder aufrecht gezeigt, damit Text
+  // und Porträt lesbar sind (Kartenbilder sind 90° gegen den Uhrzeiger gedreht).
+  const LANDSCAPE = new Set(['A', 'B', 'C', 'E', 'F', 'H']);
+  function upright(card, design) {
+    if (!LANDSCAPE.has(design)) return card;
+    const c = document.createElement('canvas');
+    c.width = card.height; c.height = card.width;
+    const x = c.getContext('2d');
+    x.translate(c.width, 0);
+    x.rotate(Math.PI / 2);          // 90° im Uhrzeigersinn zurückdrehen
+    x.drawImage(card, 0, 0);
+    return c;
+  }
+
+  // Bild skaliert mit Glühen bzw. Schatten zeichnen (Mittelpunkt cx, cy)
+  function drawScaled(x, img, cx, cy, dw, dh, glow) {
+    x.save();
+    x.shadowColor = glow || 'rgba(0,0,0,0.45)';
+    x.shadowBlur = glow ? 60 : 30;
+    x.shadowOffsetY = glow ? 0 : 14;
+    x.drawImage(img, cx - dw / 2, cy - dh / 2, dw, dh);
+    x.restore();
+  }
+
+  // Textblock unter den Karten: Packwert (Mint), Edition (Gelb), Name (Weiß)
+  const TEXT = {
+    value: { size: 96, font: FONT, weight: 700, color: '#6FE3C3', after: 20 },
+    label: { size: 44, font: FONT, weight: 700, color: '#FFC53D', after: 14 },
+    desc: { size: 30, font: BODY, weight: 500, color: '#FFFFFF', after: 0 },
+  };
+  function textLines(result, specials, h) {
+    const lines = [{ kind: 'value', text: h.fmt(result.value) }];
+    if (specials.length) {
+      const labels = [...new Set(specials.map((it) => specialLabel(it, h.editionName)))];
+      lines.push({ kind: 'label', text: labels.join(' · ') });
+      lines.push({ kind: 'desc', text: specials.map((it) => h.shortName(it)).join('   |   ') });
+    }
+    return lines;
+  }
+  const lineHeight = (k) => Math.round(TEXT[k].size * 1.12);
+  function textHeight(lines) {
+    return lines.reduce((sum, l, i) => sum + lineHeight(l.kind) + (i < lines.length - 1 ? TEXT[l.kind].after : 0), 0);
+  }
+  function drawText(x, lines, top) {
+    let y = top;
+    x.textAlign = 'center';
+    x.textBaseline = 'top';
+    lines.forEach((l) => {
+      const t = TEXT[l.kind];
+      x.font = `${t.weight} ${t.size}px ${t.font}`;
+      x.fillStyle = t.color;
+      x.fillText(l.text, W / 2, y, W - 100);   // schmaler statt überlappend
+      y += lineHeight(l.kind) + t.after;
+    });
+  }
+
+  const BUTTON_FS = 30;
+  const BUTTON_H = Math.round(BUTTON_FS * 1.6);
+  function drawButton(x, url, cy) {
+    pill(x, 'Selbst öffnen: ' + url.replace(/^https?:\/\//, '').replace(/\/$/, ''), W / 2, cy, BUTTON_FS, 'rgba(11,16,32,0.75)', '#fff', 'center');
+  }
+
+  // Unter der Überschrift: Karten, Textblock und Link-Button mit gleichen
+  // Abständen (oben, dazwischen, unten). Liefert die y-Positionen.
+  const AREA_TOP = 300;
+  const AREA_BOTTOM = H - 30;
+  function stack(blockH, textH) {
+    const free = AREA_BOTTOM - AREA_TOP - blockH - textH - BUTTON_H;
+    const gap = Math.max(24, free / 4);
+    const blockTop = AREA_TOP + gap;
+    const textTop = blockTop + blockH + gap;
+    const buttonCy = textTop + textH + gap + BUTTON_H / 2;
+    return { gap, blockTop, textTop, buttonCy };
   }
 
   // Wert sortiert, bester in die Mitte (wie die Übersicht in der App)
@@ -296,58 +359,81 @@
     else if (specials.length) header(x, 'PACK GEÖFFNET', specials.length > 1 ? 'SELTENE FUNDE' : 'SELTENER FUND');
     else header(x, 'PACK', 'GEÖFFNET');
 
+    const lines = textLines(result, specials, h);
+    const textH = textHeight(lines);
+    const maxBlock = AREA_BOTTOM - AREA_TOP - textH - BUTTON_H - 4 * 36;
+
     if (specials.length) {
-      // Groß: die besonderen Karten bzw. Münzen, mit Beschriftung
-      const n = specials.length;
-      const cw = coin ? (n === 1 ? 560 : n === 2 ? 400 : 300) : (n === 1 ? 400 : n === 2 ? 330 : 270);
-      const imgs = await Promise.all(specials.map((it) => (coin ? renderCoin(it, cw, h.coinImage) : renderNote(it, cw, h.editionName))));
+      // Groß und aufrecht: die besonderen Karten bzw. Münzen. Plakette oben
+      // rechts außerhalb der Karte, Beschriftung im Textblock darunter.
+      const cards = await Promise.all(specials.map(async (it) => (coin
+        ? renderCoin(it, 600, h.coinImage)
+        : upright(await renderNote(it, 600, h.editionName, false), it.design))));
+      const badges = specials.map((it) => (it.kind === 'note' && it.edition ? h.editionName(it.edition) : null));
+      const badgeH = badges.some(Boolean) ? BUTTON_H + 14 : 0;
       const gap = 40;
-      const total = n * cw + (n - 1) * gap;
-      const top = coin ? (n === 1 ? 330 : 430) : 310;
-      imgs.forEach((img, i) => {
-        const cx = W / 2 - total / 2 + cw / 2 + i * (cw + gap);
-        const rarity = h.glowOf(specials[i]);
-        place(x, img, cx, top + img.height / 2, n === 1 ? 0 : (i - (n - 1) / 2) * 3, rarity || 'rgba(255,255,255,0.55)');
-        const capY = top + img.height + (coin ? 20 : 54);
-        x.textAlign = 'center'; x.textBaseline = 'alphabetic';
-        x.fillStyle = '#FFC53D';
-        const maxW = n === 1 ? W - 120 : cw + gap - 12;
-        x.font = `700 ${n === 1 ? 44 : 28}px ${FONT}`;
-        x.fillText(specialLabel(specials[i], h.editionName), cx, capY, maxW);
-        x.fillStyle = '#fff';
-        x.font = `500 ${n === 1 ? 30 : 24}px ${BODY}`;
-        const it = specials[i];
-        const desc = n === 1 ? h.shortName(it)
-          : it.kind === 'coin' ? h.shortName(it) : `${it.denom} € · Entwurf ${it.design}`;
-        x.fillText(desc, cx, capY + (n === 1 ? 46 : 34), maxW);
+      const maxH = maxBlock - badgeH;
+      // Reihe oder Spalte – was die Karten größer zeigt
+      const rowScale = Math.min((W - 120 - gap * (cards.length - 1)) / cards.reduce((s2, c2) => s2 + c2.width, 0),
+        maxH / Math.max(...cards.map((c2) => c2.height)));
+      const colScale = Math.min((W - 160) / Math.max(...cards.map((c2) => c2.width)),
+        (maxH - gap * (cards.length - 1)) / cards.reduce((s2, c2) => s2 + c2.height, 0));
+      const asRow = cards.length === 1 || rowScale >= colScale;
+      const k = Math.min(asRow ? rowScale : colScale, coin ? 0.95 : 1.6);
+      const sizes = cards.map((c2) => ({ w: c2.width * k, h: c2.height * k }));
+      const blockH = badgeH + (asRow
+        ? Math.max(...sizes.map((z) => z.h))
+        : sizes.reduce((s2, z) => s2 + z.h, 0) + gap * (cards.length - 1));
+      const pos = stack(blockH, textH);
+      const cardsTop = pos.blockTop + badgeH;
+      const rowW = sizes.reduce((s2, z) => s2 + z.w, 0) + gap * (cards.length - 1);
+      let cursorX = W / 2 - rowW / 2;
+      let cursorY = cardsTop;
+      cards.forEach((card, i) => {
+        const z = sizes[i];
+        const cx = asRow ? cursorX + z.w / 2 : W / 2;
+        const cy = asRow ? cardsTop + (blockH - badgeH) / 2 : cursorY + z.h / 2;
+        drawScaled(x, card, cx, cy, z.w, z.h, h.glowOf(specials[i]) || 'rgba(255,255,255,0.55)');
+        if (badges[i]) {
+          // oben rechts, außerhalb der Karte
+          pill(x, badges[i], cx + z.w / 2, cy - z.h / 2 - 14 - BUTTON_H / 2, BUTTON_FS, '#0B1020', '#fff', 'right');
+        }
+        cursorX += z.w + gap;
+        cursorY += z.h + gap;
       });
+      drawText(x, lines, pos.textTop);
+      drawButton(x, url, pos.buttonCy);
     } else if (coin) {
       // Alle zehn Münzen, zwei Reihen
       const size = 196, gapX = 12, gapY = 36;
+      const blockH = size * 2 + gapY;
+      const pos = stack(blockH, textH);
       const imgs = await Promise.all(result.items.map((it) => renderCoin(it, size, h.coinImage)));
       const { order } = fanOrder(result.items, h.itemValue);
       order.forEach((it, i) => {
         const img = imgs[result.items.indexOf(it)];
         const row = i < 5 ? 0 : 1, col = i % 5;
-        const cx = W / 2 + (col - 2) * (size + gapX);
-        const cy = 540 + row * (size + gapY);
-        place(x, img, cx, cy, 0);
+        place(x, img, W / 2 + (col - 2) * (size + gapX), pos.blockTop + size / 2 + row * (size + gapY), 0);
       });
+      drawText(x, lines, pos.textTop);
+      drawButton(x, url, pos.buttonCy);
     } else {
       // Alle Scheine aufgefächert, der beste groß in der Mitte
       const { order, top } = fanOrder(result.items, h.itemValue);
       const imgs = await Promise.all(order.map((it) => renderNote(it, it === top ? 250 : 196, h.editionName)));
+      const blockH = Math.round(250 * 1.9) + 40;   // größter Schein plus Fächer
+      const pos = stack(blockH, textH);
+      const mid = pos.blockTop + blockH / 2;
       const n = order.length;
       order.forEach((it, i) => {
         if (it === top) return;
-        const k = i - (n - 1) / 2;
-        place(x, imgs[i], W / 2 + k * 182, 640 + Math.abs(k) * 26, k * 6);
+        const kk = i - (n - 1) / 2;
+        place(x, imgs[i], W / 2 + kk * 182, mid + 20 + Math.abs(kk) * 22, kk * 6);
       });
-      const ti = order.indexOf(top);
-      place(x, imgs[ti], W / 2, 610, 0, h.glowOf(top));
+      place(x, imgs[order.indexOf(top)], W / 2, mid - 10, 0, h.glowOf(top));
+      drawText(x, lines, pos.textTop);
+      drawButton(x, url, pos.buttonCy);
     }
-
-    footer(x, result, url, h.fmt);
 
     let blob = null;
     try {
