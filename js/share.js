@@ -4,7 +4,7 @@
  * Normaler Pack: alle Scheine aufgefächert bzw. alle zehn Münzen.
  * Besondere Funde (Special Edition, seltene Seriennummer, Gedenkmünze,
  * seltenes Land): die besten bis zu drei groß, mit Effekt und Beschriftung.
- * Dazu Packwert, Urteil („Bank gewinnt“) und der Link zur Seite.
+ * Darunter Packwert, bei Funden Edition und Schein, und der Link zur Seite.
  *
  * window.EBShare.build(result, helpers) -> Promise<{ blob, text, special }>
  * window.EBShare.pageUrl()              -> Link zur Seite
@@ -444,11 +444,7 @@
     const lead = result.godPack ? 'Zentralbank-Pack bei EUROPACK!'
       : best ? `Seltener Fund bei EUROPACK: ${specialLabel(best, h.editionName)} – ${h.shortName(best)}.`
       : 'Mein EUROPACK ist offen.';
-    const verdict = result.price === 0 ? 'Bonus-Pack!'
-      : result.value > result.price ? 'Ich schlage die EZB!'
-      : result.value === result.price ? 'Unentschieden mit der EZB.'
-      : 'Die Bank gewinnt.';
-    const text = `${lead} ${h.fmt(result.value)} Packwert für ${h.fmt(result.price)}. ${verdict}\nSelbst öffnen: ${url}`;
+    const text = `${lead} ${h.fmt(result.value)} Packwert.\nSelbst öffnen: ${url}`;
     return { blob, text, url, special: !!best || !!result.godPack, canvas: c };
   }
 
